@@ -1,0 +1,11 @@
+*
+!*.*
+!*/
+
+.DS_Store
+*.sw?
+
+
+build/*
+
+.config/ecdsa_private_key.pem
