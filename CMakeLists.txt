@@ -14,6 +14,14 @@ else()
 endif()
 
 
+
+add_library( W_SHA SHARED
+			  ./w_sha/sha.cpp
+)
+target_link_libraries( W_SHA PUBLIC
+						${OPENSSL_LIBRARIES}
+)
+
 add_library( W_EVP_PKEY SHARED
 			  ./w_evp_pkey/evp_pkey.cpp
 )
@@ -27,6 +35,7 @@ add_library( W_RSA_MANAGER SHARED
 )
 target_link_libraries( W_RSA_MANAGER PUBLIC
 						W_EVP_PKEY
+						W_SHA
 						${OPENSSL_LIBRARIES}
 )
 

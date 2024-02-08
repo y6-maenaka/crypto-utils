@@ -25,6 +25,13 @@ bool case_1()
   size_t encryptedLength = 0;
   encryptedLength = W_RSAManager::encrypt( wpkey.get() ,plain.get() , 10 , &encrypted );
   std::cout << "encryptedLength :: " << encryptedLength << "\n";
+  
+  std::shared_ptr<unsigned char> signature;
+  size_t signatureLength;
+  signatureLength = W_RSAManager::sign( wpkey.get(), plain.get(), 10 , &signature );
+
+
+  std::cout << "Sign Lenght :: " << signatureLength  << "\n";
 
   
   std::shared_ptr<unsigned char> decrypted;
