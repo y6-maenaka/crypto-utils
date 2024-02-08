@@ -19,6 +19,11 @@ W_EVP_PKEY::W_EVP_PKEY( std::string pemPath )
 
 }
 
+W_EVP_PKEY::W_EVP_PKEY( std::shared_ptr<EVP_PKEY> fromPkey )
+{
+  _body = fromPkey;
+}
+
 bool W_EVP_PKEY::savePub( std::string path )
 {
   BIO *write_bio_fp;
@@ -81,7 +86,15 @@ bool W_EVP_PKEY::loadPri( std::string path, std::string pass )
 
 }
 
+std::shared_ptr<EVP_PKEY> W_EVP_PKEY::pkey()
+{
+  return _body;
+}
 
+EVP_PKEY* W_EVP_PKEY::rawPkey()
+{
+  return this->pkey().get();
+}
 
 
 void W_EVP_PKEY::print() const
@@ -169,18 +182,18 @@ std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine )
 
 std::shared_ptr<W_EVP_PKEY> w_empty_pkey()
 {
-  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>();
-  std::shared_ptr<EVP_PKEY> pkey = empty_pkey();
-  ret->pkey( pkey );
+  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>( empty_pkey() );
+  // std::shared_ptr<EVP_PKEY> pkey = empty_pkey();
+  // ret->pkey( pkey );
 
   return ret;
 }
 
 std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits )
 {
-  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>();
-  std::shared_ptr<EVP_PKEY> pkey = rsa_pkey( keyBits );
-  ret->pkey( pkey );
+  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>( rsa_pkey(keyBits) );
+  //std::shared_ptr<EVP_PKEY> pkey = rsa_pkey( keyBits );
+  // ret->pkey( pkey );
 
   return ret;
 }

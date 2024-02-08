@@ -32,8 +32,7 @@ public:
   
   W_EVP_PKEY();
   W_EVP_PKEY( std::string pemPath );
-  // W_EVP_PKEY( std::string loadPemPath , std::string keyType );
-  // W_EVP_PKEY( std::string keyType );
+  W_EVP_PKEY( std::shared_ptr<EVP_PKEY> fromPkey );
 
   bool savePub( std::string path );
   bool savePri( std::string path, std::string pass );
@@ -41,6 +40,10 @@ public:
   bool loadPub( std::string path );
   bool loadPri( std::string path, std::string pass );
 
+  std::shared_ptr<EVP_PKEY> pkey();
+  EVP_PKEY* rawPkey();
+
+  int type();
   void print() const;
 };
 
@@ -66,8 +69,6 @@ std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine = NID_secp256k1 );
 std::shared_ptr<W_EVP_PKEY> w_pkey( std::string pemPath );
 std::shared_ptr<W_EVP_PKEY> w_empty_pkey();
 std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits = 4096 );
-
-
 
 
 
