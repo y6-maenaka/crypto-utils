@@ -32,6 +32,10 @@ bool case_1()
 
 
   std::cout << "Sign Lenght :: " << signatureLength  << "\n";
+  memcpy( signature.get() + 10 , "aq", 2 );
+  int verifyRet = W_RSAManager::verify( wpkey.get(), signature.get() , signatureLength, plain.get() , 10 );
+  std::cout << "署名結果 :: " << verifyRet << "\n";
+  
 
   
   std::shared_ptr<unsigned char> decrypted;
