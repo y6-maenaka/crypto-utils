@@ -10,7 +10,7 @@ namespace sha
 
 
 
-size_t SHA::hash( unsigned char* from , size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type )
+size_t W_SHA::hash( const unsigned char* from , const size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type )
 {
   const EVP_MD *md;
   size_t outLength = 0;
