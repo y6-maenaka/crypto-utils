@@ -52,6 +52,7 @@ bool case_1()
   std::cout << "++++++++++++++++++++++++++++++++++++" << "\n";
 
     
+<<<<<<< HEAD
   // std::string retFilePath = "_sample.mp4";
   // W_AES128Manager::decryptStream( cipherFilePath, 0 , 0, &key , retFilePath );
 
@@ -69,6 +70,10 @@ bool case_1()
 	W_AES128Manager::encryptStream( inputFilePath , 0 , 0 , &key , outputFilePath );
 	W_AES128Manager::decryptStream( outputFilePath , 0 , 0 , &key , retFilePath );
   }
+=======
+  std::string retFilePath = "_sample.mp4";
+  W_AES128Manager::decryptStream( cipherFilePath, 0 , 0, &key , retFilePath );
+>>>>>>> 633a71a12da870a44d854f01698f82567d91d28a
 
 
   return false;

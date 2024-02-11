@@ -25,6 +25,7 @@ std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt409
 std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , size_t size )
 {
   std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size + 16] );
+  // std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size] );
   int plainBinLength = 0;
 
   if( EVP_DecryptUpdate( cctx , plainBin.get(), &plainBinLength , cipherBin, size ) <= 0 ){
