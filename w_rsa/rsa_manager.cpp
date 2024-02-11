@@ -12,7 +12,7 @@ namespace rsa
 
 
 
-size_t W_RSAManager::encrypt( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* plainBin , size_t plainBinLength ,std::shared_ptr<unsigned char> *cipherBin )
+size_t W_RSAManager::encrypt( evp_pkey::W_EVP_PKEY* wpkey , const unsigned char* plainBin , const size_t plainBinLength ,std::shared_ptr<unsigned char> *cipherBin )
 {
   EVP_PKEY_CTX *pctx = nullptr;
   size_t outLength;
@@ -49,12 +49,12 @@ size_t W_RSAManager::encrypt( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* plain
 }
 
 
-size_t W_RSAManager::sign( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* plainBin , size_t plainBinLength , std::shared_ptr<unsigned char> *signBin )
+size_t W_RSAManager::sign( evp_pkey::W_EVP_PKEY* wpkey , const unsigned char* plainBin , const size_t plainBinLength , std::shared_ptr<unsigned char> *signBin )
 {
   size_t outLength = 0;
   std::shared_ptr<unsigned char> md; size_t mdLength;
 
-  mdLength = sha::SHA::hash( plainBin , plainBinLength, &md , "sha256" );
+  mdLength = sha::W_SHA::hash( plainBin , plainBinLength, &md , "sha256" );
   if( mdLength <= 0 || md == nullptr ) return 0;
 
   EVP_PKEY_CTX* pctx = EVP_PKEY_CTX_new( wpkey->rawPkey() , nullptr );
@@ -82,7 +82,7 @@ size_t W_RSAManager::sign( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* plainBin
 }
 
 
-size_t W_RSAManager::decrypt( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* cipherBin , size_t cipherBinLength ,std::shared_ptr<unsigned char> *plainBin )
+size_t W_RSAManager::decrypt( evp_pkey::W_EVP_PKEY* wpkey , const unsigned char* cipherBin , const size_t cipherBinLength ,std::shared_ptr<unsigned char> *plainBin )
 {
   EVP_PKEY_CTX *pctx = nullptr;
   size_t outLength;
@@ -119,7 +119,7 @@ size_t W_RSAManager::decrypt( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* ciphe
 }
 
 
-bool W_RSAManager::verify( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* signBin , size_t signBinLength , unsigned char* msgBin /* ハッシュ前の本体バイナリ */ , size_t msgBinLength )
+bool W_RSAManager::verify( evp_pkey::W_EVP_PKEY* wpkey , const unsigned char* signBin , const size_t signBinLength , const unsigned char* msgBin, const size_t msgBinLength )
 {
   if( signBin == nullptr || signBinLength <= 0 ) return false;
   if( msgBin == nullptr || msgBinLength <= 0 ) return false;
@@ -128,7 +128,7 @@ bool W_RSAManager::verify( evp_pkey::W_EVP_PKEY* wpkey , unsigned char* signBin 
   if( pctx == nullptr ) return false;
   
   std::shared_ptr<unsigned char> msgDigest = nullptr; size_t msgDigestLength;
-  msgDigestLength = sha::SHA::hash( msgBin, msgBinLength , &msgDigest , "sha256" );
+  msgDigestLength = sha::W_SHA::hash( msgBin, msgBinLength , &msgDigest , "sha256" );
   if( msgDigest == nullptr || msgDigestLength <= 0 )  return false;
 
   if( EVP_PKEY_verify_init( pctx ) <= 0 ){
