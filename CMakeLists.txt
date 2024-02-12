@@ -14,6 +14,13 @@ else()
 endif()
 
 
+add_library( W_BASE64 SHARED
+			  ./w_base64/base64.cpp
+			  ./w_base64/test/case_1.cpp
+)
+target_link_libraries( W_BASE64 PUBLIC
+						${OPENSSL_LIBRARIES}
+)
 
 add_library( W_SHA SHARED
 			  ./w_sha/sha.cpp
@@ -53,6 +60,7 @@ target_link_libraries( runner PRIVATE
 						W_RSA_MANAGER
 						W_AES_MANAGER
 						W_EVP_PKEY
+						W_BASE64
 )
 
 

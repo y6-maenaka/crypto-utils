@@ -52,7 +52,6 @@ bool case_1()
   std::cout << "++++++++++++++++++++++++++++++++++++" << "\n";
 
     
-<<<<<<< HEAD
   // std::string retFilePath = "_sample.mp4";
   // W_AES128Manager::decryptStream( cipherFilePath, 0 , 0, &key , retFilePath );
 
@@ -63,18 +62,6 @@ bool case_1()
   std::string inputFilePath = "./generalmegabeast.txt";
   std::string outputFilePath = "./generalmegabeast.cipher";
   std::string retFilePath = "./_generalmegabeast.txt";
-
-  for( int i=0; i<300; i++ )
-  {
-	std::cout << i << "\n";
-	W_AES128Manager::encryptStream( inputFilePath , 0 , 0 , &key , outputFilePath );
-	W_AES128Manager::decryptStream( outputFilePath , 0 , 0 , &key , retFilePath );
-  }
-=======
-  std::string retFilePath = "_sample.mp4";
-  W_AES128Manager::decryptStream( cipherFilePath, 0 , 0, &key , retFilePath );
->>>>>>> 633a71a12da870a44d854f01698f82567d91d28a
-
 
   return false;
 }
