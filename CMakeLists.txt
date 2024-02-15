@@ -3,7 +3,17 @@ cmake_minimum_required( VERSION 3.2 )
 project( OPENSSL_WRAPPER CXX )
 
 find_package( PkgConfig REQUIRED )
-find_package( OPENSSL REQUIRED )
+
+
+if(APPLE)
+  find_package( OPENSSL REQUIRED )
+elseif(UNIX)
+  find_package( OpenSSL REQUIRED )
+else()
+  # winは未定義
+endif()
+
+
 
 if( OPENSSL_FOUND )
   include_directories( ${OPENSSL_INCLUDE_DIR} )
