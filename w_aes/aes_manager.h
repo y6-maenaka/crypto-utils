@@ -9,6 +9,7 @@
 #include <memory>
 #include <cmath>
 #include <filesystem>
+#include <cstring>
 
 #include "openssl/evp.h"
 
