@@ -14,15 +14,11 @@ namespace sha
 {
 
 
-
 class W_SHA
 {
 public:
-  static size_t hash( const unsigned char* from , const size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type );
+  static std::size_t hash( const unsigned char* from , const std::size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type );
 };
-
-
-
 
 
 };

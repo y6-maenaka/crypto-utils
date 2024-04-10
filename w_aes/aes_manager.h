@@ -19,7 +19,7 @@ namespace aes
 {
 
 
-constexpr size_t AES_CBC_128_BYTES = 16;
+constexpr std::size_t AES_CBC_128_BYTES = 16;
 
 
 class W_AESKey_128
@@ -39,25 +39,21 @@ public:
   };
 };
 
-
-
-
-
   
 class W_AES128Manager
 {
 private:
-  static std::pair< size_t , std::shared_ptr<unsigned char> > encrypt4096Base( const unsigned char* plainBin , EVP_CIPHER_CTX* cctx ,size_t size = 4096 );
-  static std::pair< size_t , std::shared_ptr<unsigned char> > decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , size_t size = 4096 );
+  static std::pair< std::size_t , std::shared_ptr<unsigned char> > encrypt4096Base( const unsigned char* plainBin , EVP_CIPHER_CTX* cctx ,std::size_t size = 4096 );
+  static std::pair< std::size_t , std::shared_ptr<unsigned char> > decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , std::size_t size = 4096 );
 
 public:
-  static size_t encrypt( const unsigned char* plainBin , const size_t plainBinLength , W_AESKey_128* key ,std::shared_ptr<unsigned char> *cipherBin );
-  static size_t encryptStream( std::string plainFilePath , size_t begin , size_t size , W_AESKey_128* key , std::string cipherFilePath );
+  static std::size_t encrypt( const unsigned char* plainBin , const std::size_t plainBinLength , W_AESKey_128* key ,std::shared_ptr<unsigned char> *cipherBin );
+  static std::size_t encryptStream( std::string plainFilePath , std::size_t begin , std::size_t size , W_AESKey_128* key , std::string cipherFilePath );
 
-  static size_t decrypt( const unsigned char* cipherBin, const size_t cipherLength, W_AESKey_128*key , std::shared_ptr<unsigned char> *plainBin );
-  static size_t decryptStream( std::string cipherFilePath, size_t begin, size_t size , W_AESKey_128* key , std::string plainFilePath ); 
+  static std::size_t decrypt( const unsigned char* cipherBin, const std::size_t cipherLength, W_AESKey_128*key , std::shared_ptr<unsigned char> *plainBin );
+  static std::size_t decryptStream( std::string cipherFilePath, std::size_t begin, std::size_t size , W_AESKey_128* key , std::string plainFilePath ); 
 
-  static size_t encryptLength( size_t plainBinLength );
+  static std::size_t encryptLength( std::size_t plainBinLength );
 };
 
 

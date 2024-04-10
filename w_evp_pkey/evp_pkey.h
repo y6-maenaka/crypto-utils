@@ -25,7 +25,6 @@ private:
 
   int _status;
   std::string _keyType;
-  // int _onMemory, _onPem;
 
 public:
   void pkey( std::shared_ptr<EVP_PKEY> fromPkey );
@@ -46,11 +45,6 @@ public:
   int type();
   void print() const;
 };
-
-
-
-
-
 
 
 struct EVP_PKEY_deleter

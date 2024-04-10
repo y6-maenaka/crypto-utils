@@ -7,16 +7,14 @@ namespace evp_pkey
 {
 
 
-
-
 W_EVP_PKEY::W_EVP_PKEY()
 {
-
+  return;
 }
 
 W_EVP_PKEY::W_EVP_PKEY( std::string pemPath )
 {
-
+  return;
 }
 
 W_EVP_PKEY::W_EVP_PKEY( std::shared_ptr<EVP_PKEY> fromPkey )

@@ -10,7 +10,7 @@ namespace aes
 
 
 
-std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt4096Base( const unsigned char* plainBin , EVP_CIPHER_CTX* cctx, size_t size )
+std::pair< std::size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt4096Base( const unsigned char* plainBin , EVP_CIPHER_CTX* cctx, std::size_t size )
 {
   std::shared_ptr<unsigned char> cipherBin = std::shared_ptr<unsigned char>( new unsigned char[size + 16] );
   int cipherBinLength = 0;
@@ -22,7 +22,7 @@ std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt409
   return std::make_pair( cipherBinLength, cipherBin );
 }
 
-std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , size_t size )
+std::pair< std::size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decrypt4096Base( const unsigned char* cipherBin , EVP_CIPHER_CTX* cctx , std::size_t size )
 {
   std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size + 16] );
   // std::shared_ptr<unsigned char> plainBin = std::shared_ptr<unsigned char>( new unsigned char[size] );
@@ -41,7 +41,7 @@ std::pair< size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decrypt409
 
 
 
-size_t W_AES128Manager::encrypt( const unsigned char* plainBin , const size_t plainBinLength , W_AESKey_128* key ,std::shared_ptr<unsigned char> *cipherBin )
+std::size_t W_AES128Manager::encrypt( const unsigned char* plainBin , const std::size_t plainBinLength , W_AESKey_128* key ,std::shared_ptr<unsigned char> *cipherBin )
 {
   EVP_CIPHER_CTX *cctx = EVP_CIPHER_CTX_new();
 
@@ -71,7 +71,7 @@ size_t W_AES128Manager::encrypt( const unsigned char* plainBin , const size_t pl
 }
 
 
-size_t W_AES128Manager::encryptStream( std::string plainFilePath , size_t begin , size_t size , W_AESKey_128* key, std::string cipherFilePath )
+std::size_t W_AES128Manager::encryptStream( std::string plainFilePath , std::size_t begin , size_t size , W_AESKey_128* key, std::string cipherFilePath )
 {
   if( !(std::filesystem::exists(plainFilePath)) ) return 0;
   std::uintmax_t fileSize = std::filesystem::file_size(plainFilePath);
@@ -105,14 +105,14 @@ size_t W_AES128Manager::encryptStream( std::string plainFilePath , size_t begin 
   }
   
   if( size == 0 ) size = fileSize;
-  size_t plainDataLength = 0;
+  std::size_t plainDataLength = 0;
   plainDataLength = ( (begin + size) > fileSize ) ? fileSize - begin : size; // ファイルサイズを超えたら打ち切る
 
-  size_t fixedUpdateCount = floor( plainDataLength / 4096 );
-  size_t remainDataLength = plainDataLength - (fixedUpdateCount * 4096);
+  std::size_t fixedUpdateCount = floor( plainDataLength / 4096 );
+  std::size_t remainDataLength = plainDataLength - (fixedUpdateCount * 4096);
 
   int encryptedTotalLength = 0;
-  std::pair< size_t, std::shared_ptr<unsigned char> > encrypted;
+  std::pair< std::size_t, std::shared_ptr<unsigned char> > encrypted;
   std::shared_ptr<char> readedData = std::shared_ptr<char>( new char[4096] );
   for( int i=0; i < fixedUpdateCount; i++ )
   {
@@ -147,7 +147,7 @@ size_t W_AES128Manager::encryptStream( std::string plainFilePath , size_t begin 
 }
 
 
-size_t W_AES128Manager::decrypt( const unsigned char* cipherBin, const size_t cipherLength, W_AESKey_128*key , std::shared_ptr<unsigned char> *plainBin )
+std::size_t W_AES128Manager::decrypt( const unsigned char* cipherBin, const std::size_t cipherLength, W_AESKey_128*key , std::shared_ptr<unsigned char> *plainBin )
 {
   EVP_CIPHER_CTX *cctx = EVP_CIPHER_CTX_new();
 
@@ -177,7 +177,7 @@ size_t W_AES128Manager::decrypt( const unsigned char* cipherBin, const size_t ci
 }
 
 
-size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin , size_t size , W_AESKey_128* key , std::string plainFilePath )
+std::size_t W_AES128Manager::decryptStream( std::string cipherFilePath, std::size_t begin , std::size_t size , W_AESKey_128* key , std::string plainFilePath )
 { 
   if( !(std::filesystem::exists(cipherFilePath)) ) return 0;
   std::uintmax_t fileSize = std::filesystem::file_size(cipherFilePath);
@@ -208,16 +208,16 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
   }
 
   if( size == 0 ) size = fileSize;
-  size_t cipherDataLength = 0;
+  std::size_t cipherDataLength = 0;
   cipherDataLength = ( (begin + size) > fileSize ) ? fileSize - begin : size;
   if( (cipherDataLength % 16) != 0 ) return 0; // 対象が正常に暗号化されていない可能性がある
 
   int decryptedTotalLength = 0;
   int updateCount = floor(cipherDataLength / 4096);
-  size_t remainDataLength = cipherDataLength - (updateCount * 4096);
+  std::size_t remainDataLength = cipherDataLength - (updateCount * 4096);
 
   std::shared_ptr<char> readedData = std::shared_ptr<char>( new char[4096] );
-  std::pair< size_t , std::shared_ptr<unsigned char> > decrypted;
+  std::pair< std::size_t , std::shared_ptr<unsigned char> > decrypted;
   for( int i=0; i<updateCount; i++ )
   {
 	cipherFile.stream.read( readedData.get(), 4096 );
@@ -257,9 +257,9 @@ size_t W_AES128Manager::decryptStream( std::string cipherFilePath, size_t begin 
 
 
 
-size_t W_AES128Manager::encryptLength( size_t plainBinLength )
+std::size_t W_AES128Manager::encryptLength( std::size_t plainBinLength )
 {
-  size_t unpaddedLength = floor( plainBinLength / AES_CBC_128_BYTES  ) * AES_CBC_128_BYTES ;
+  std::size_t unpaddedLength = floor( plainBinLength / AES_CBC_128_BYTES  ) * AES_CBC_128_BYTES ;
   return unpaddedLength + AES_CBC_128_BYTES ;
 }
 

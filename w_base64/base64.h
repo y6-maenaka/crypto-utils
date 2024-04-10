@@ -8,22 +8,18 @@
 #include <vector>
 
 
-
-
 namespace openssl_wrapper
 {
 namespace base64
 {
 
 
-
 class W_Base64
 {
 public:
-  static std::string encode( const unsigned char* from , const size_t fromLength );
-  static std::vector<unsigned char> decode( const unsigned char* from , const size_t fromLength );
+  static std::string encode( const unsigned char* from , const std::size_t fromLength );
+  static std::vector<unsigned char> decode( const unsigned char* from , const std::size_t fromLength );
 };
-
 
 
 };
