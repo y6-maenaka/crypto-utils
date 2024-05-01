@@ -1,16 +1,11 @@
-#include "sha.h"
+#include "sha.hpp"
 
 
-namespace openssl_wrapper
-{
-namespace sha
+namespace cu
 {
 
 
-
-
-
-std::size_t W_SHA::hash( const unsigned char* from , const std::size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type )
+std::size_t w_sha::hash( const unsigned char* from , const std::size_t fromLength , std::shared_ptr<unsigned char> *out , std::string type )
 {
   const EVP_MD *md;
   std::size_t outLength = 0;
@@ -42,9 +37,5 @@ std::size_t W_SHA::hash( const unsigned char* from , const std::size_t fromLengt
 }
 
 
-
-
-
-};
 };
 

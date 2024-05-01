@@ -1,13 +1,11 @@
-#include "../aes_manager.h"
+#include "../aes_manager.hpp"
 
-namespace openssl_wrapper
+
+namespace cu
 {
-namespace aes
-{
 
 
-
-bool case_1()
+/* bool case_1()
 {
   std::cout << "HelloWorld" << "\n";
   
@@ -64,9 +62,7 @@ bool case_1()
   std::string retFilePath = "./_generalmegabeast.txt";
 
   return false;
-}
+} */
 
 
-
-};
 };

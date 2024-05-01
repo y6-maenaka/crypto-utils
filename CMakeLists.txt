@@ -26,7 +26,6 @@ endif()
 
 add_library( W_BASE64 SHARED
 			  ./w_base64/base64.cpp
-			  ./w_base64/test/case_1.cpp
 )
 target_link_libraries( W_BASE64 PUBLIC
 						${OPENSSL_LIBRARIES}
@@ -72,7 +71,6 @@ target_link_libraries( runner PRIVATE
 						W_EVP_PKEY
 						W_BASE64
 )
-
 
 
 # add_definitions( -std=c++20 -w )

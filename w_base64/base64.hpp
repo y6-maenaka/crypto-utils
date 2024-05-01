@@ -8,13 +8,11 @@
 #include <vector>
 
 
-namespace openssl_wrapper
-{
-namespace base64
+namespace cu
 {
 
 
-class W_Base64
+class w_base64
 {
 public:
   static std::string encode( const unsigned char* from , const std::size_t fromLength );
@@ -22,7 +20,6 @@ public:
 };
 
 
-};
 };
 
 

@@ -1,14 +1,31 @@
 #include "runner.h"
 
-#include "./w_evp_pkey/test/case_1.cpp"
-#include "./w_rsa/test/case_1.cpp"
-#include "./w_aes/test/case_1.cpp"
-#include "./w_base64/base64.cpp"
 
+int sha_test()
+{
+  const char* input_c = "HelloWorld";
+  std::vector< std::uint8_t > input_v; 
+  for( int i=0; i<std::strlen(input_c); i++ ) input_v.push_back(input_c[i]);
+  // std::memcpy( input_v.data(), input_c, std::strlen(input_c)-1 );
+
+  std::vector<std::uint8_t> ret = cu::w_sha::hash( input_v.data(), input_v.size(),cu::w_sha::hash_t::SHA1 );
+
+  std::cout << "input_v size :: " << input_v.size() << "\n";
+  std::cout << "md length :: " << ret.size() << "\n";
+  for( int i=0; i<input_v.size(); i++ ) printf("%c", input_v[i] );
+  std::cout << "\n";
+
+  for( int i=0; i<ret.size(); i++ ) printf("%02X", ret[i] );
+  std::cout << "\n";
+
+  return 0;
+}
 
 
 int main()
 {
+
+  return sha_test();
   // openssl_wrapper::evp_pkey::case_1();
   // openssl_wrapper::rsa::case_1();
   // openssl_wrapper::aes::case_1();
@@ -18,7 +35,7 @@ int main()
   memcpy( from.get(), "hello", 5 );
 
   std::string encoded;
-  encoded = openssl_wrapper::base64::W_Base64::encode( from.get(), 5 );
+  encoded = cu::w_base64::encode( from.get(), 5 );
 
   for( int i=0; i<encoded.size(); i++ )
 	std::cout << encoded.at(i);
@@ -27,7 +44,7 @@ int main()
   std::cout << "エンコードサイズ :: " << encoded.size() << "\n";
 
   std::vector<unsigned char> decoded;
-  decoded = openssl_wrapper::base64::W_Base64::decode( reinterpret_cast<const unsigned char*>(encoded.c_str()) , encoded.size() );
+  decoded = cu::w_base64::decode( reinterpret_cast<const unsigned char*>(encoded.c_str()) , encoded.size() );
   for( int i=0; i<decoded.size(); i++ )
 	printf("%c", decoded.at(i) );
   std::cout << "\n";

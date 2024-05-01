@@ -1,13 +1,11 @@
-#include "aes_manager.h"
+#include "aes_manager.hpp"
 
 #include "openssl/aes.h"
 #include "openssl/err.h"
 
-namespace openssl_wrapper
-{
-namespace aes
-{
 
+namespace cu
+{
 
 
 std::pair< std::size_t , std::shared_ptr<unsigned char> > W_AES128Manager::encrypt4096Base( const unsigned char* plainBin , EVP_CIPHER_CTX* cctx, std::size_t size )
@@ -35,10 +33,6 @@ std::pair< std::size_t , std::shared_ptr<unsigned char> > W_AES128Manager::decry
 
   return std::make_pair( plainBinLength, plainBin );
 }
-
-
-
-
 
 
 std::size_t W_AES128Manager::encrypt( const unsigned char* plainBin , const std::size_t plainBinLength , W_AESKey_128* key ,std::shared_ptr<unsigned char> *cipherBin )
@@ -252,11 +246,6 @@ std::size_t W_AES128Manager::decryptStream( std::string cipherFilePath, std::siz
 }
 
 
-
-
-
-
-
 std::size_t W_AES128Manager::encryptLength( std::size_t plainBinLength )
 {
   std::size_t unpaddedLength = floor( plainBinLength / AES_CBC_128_BYTES  ) * AES_CBC_128_BYTES ;
@@ -264,9 +253,4 @@ std::size_t W_AES128Manager::encryptLength( std::size_t plainBinLength )
 }
 
 
-
-
-
-
-};
 };

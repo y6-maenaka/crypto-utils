@@ -1,13 +1,8 @@
-#include "../base64.h"
+#include "../base64.hpp"
 
 
-namespace openssl_wrapper
+namespace cu
 {
-namespace base64
-{
-
-
-
 
 
 bool case_1()
@@ -16,11 +11,4 @@ bool case_1()
 };
 
 
-
 };
-};
-
-
-
-
-

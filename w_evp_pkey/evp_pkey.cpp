@@ -1,28 +1,26 @@
-#include "evp_pkey.h"
+#include "evp_pkey.hpp"
 
 
-namespace openssl_wrapper
-{
-namespace evp_pkey
+namespace cu
 {
 
 
-W_EVP_PKEY::W_EVP_PKEY()
+w_evp_pkey::w_evp_pkey()
 {
   return;
 }
 
-W_EVP_PKEY::W_EVP_PKEY( std::string pemPath )
+w_evp_pkey::w_evp_pkey( std::string pemPath )
 {
   return;
 }
 
-W_EVP_PKEY::W_EVP_PKEY( std::shared_ptr<EVP_PKEY> fromPkey )
+w_evp_pkey::w_evp_pkey( std::shared_ptr<EVP_PKEY> fromPkey )
 {
   _body = fromPkey;
 }
 
-bool W_EVP_PKEY::savePub( std::string path )
+bool w_evp_pkey::savePub( std::string path )
 {
   BIO *write_bio_fp;
   write_bio_fp = BIO_new( BIO_s_file() );
@@ -34,7 +32,7 @@ bool W_EVP_PKEY::savePub( std::string path )
   return true;
 }
 
-bool W_EVP_PKEY::savePri( std::string path, std::string pass )
+bool w_evp_pkey::savePri( std::string path, std::string pass )
 {
   BIO* write_bio_fp;
   write_bio_fp = BIO_new( BIO_s_file() );
@@ -51,7 +49,7 @@ bool W_EVP_PKEY::savePri( std::string path, std::string pass )
 
 
 
-bool W_EVP_PKEY::loadPub( std::string path )
+bool w_evp_pkey::loadPub( std::string path )
 {
   BIO *read_bio_fp = NULL;
   read_bio_fp = BIO_new( BIO_s_file() );
@@ -64,7 +62,7 @@ bool W_EVP_PKEY::loadPub( std::string path )
   BIO_vfree( read_bio_fp );
   return true;
 }
-bool W_EVP_PKEY::loadPri( std::string path, std::string pass )
+bool w_evp_pkey::loadPri( std::string path, std::string pass )
 {
   BIO *read_bio_fp = NULL;
   read_bio_fp = BIO_new( BIO_s_file() );
@@ -72,7 +70,7 @@ bool W_EVP_PKEY::loadPri( std::string path, std::string pass )
   read_bio_fp = BIO_new_file( path.c_str() ,"r");
   if( read_bio_fp == nullptr ) return false;
   
-  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>();
+  std::shared_ptr<w_evp_pkey> ret = std::make_shared<w_evp_pkey>();
 
   if( pass.size() > 0 )
 	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , NULL, NULL, (char *)pass.c_str() ), EVP_PKEY_deleter() );
@@ -84,18 +82,18 @@ bool W_EVP_PKEY::loadPri( std::string path, std::string pass )
 
 }
 
-std::shared_ptr<EVP_PKEY> W_EVP_PKEY::pkey()
+std::shared_ptr<EVP_PKEY> w_evp_pkey::pkey()
 {
   return _body;
 }
 
-EVP_PKEY* W_EVP_PKEY::rawPkey()
+EVP_PKEY* w_evp_pkey::rawPkey()
 {
   return this->pkey().get();
 }
 
 
-void W_EVP_PKEY::print() const
+void w_evp_pkey::print() const
 {
   if( _body == nullptr ){
 	std::cout << "Key not set" << "\n";
@@ -110,7 +108,7 @@ void W_EVP_PKEY::print() const
 }
 
 
-void W_EVP_PKEY::pkey( std::shared_ptr<EVP_PKEY> fromPkey )
+void w_evp_pkey::pkey( std::shared_ptr<EVP_PKEY> fromPkey )
 {
   _body = fromPkey;
 }
@@ -178,18 +176,18 @@ std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine )
 }
 
 
-std::shared_ptr<W_EVP_PKEY> w_empty_pkey()
+std::shared_ptr<w_evp_pkey> w_empty_pkey()
 {
-  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>( empty_pkey() );
+  std::shared_ptr<w_evp_pkey> ret = std::make_shared<w_evp_pkey>( empty_pkey() );
   // std::shared_ptr<EVP_PKEY> pkey = empty_pkey();
   // ret->pkey( pkey );
 
   return ret;
 }
 
-std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits )
+std::shared_ptr<w_evp_pkey> w_rsa_pkey( int keyBits )
 {
-  std::shared_ptr<W_EVP_PKEY> ret = std::make_shared<W_EVP_PKEY>( rsa_pkey(keyBits) );
+  std::shared_ptr<w_evp_pkey> ret = std::make_shared<w_evp_pkey>( rsa_pkey(keyBits) );
   //std::shared_ptr<EVP_PKEY> pkey = rsa_pkey( keyBits );
   // ret->pkey( pkey );
 
@@ -197,15 +195,4 @@ std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits )
 }
 
 
-
-
-
-
-
-
-
-
-
-
-};
 };

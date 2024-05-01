@@ -11,14 +11,11 @@
 #include "openssl/pem.h"
 
 
-namespace openssl_wrapper
-{
-namespace evp_pkey
+namespace cu
 {
 
 
-
-class W_EVP_PKEY
+class w_evp_pkey
 {
 private:
   std::shared_ptr<EVP_PKEY> _body = nullptr;
@@ -29,9 +26,9 @@ private:
 public:
   void pkey( std::shared_ptr<EVP_PKEY> fromPkey );
   
-  W_EVP_PKEY();
-  W_EVP_PKEY( std::string pemPath );
-  W_EVP_PKEY( std::shared_ptr<EVP_PKEY> fromPkey );
+  w_evp_pkey();
+  w_evp_pkey( std::string pemPath );
+  w_evp_pkey( std::shared_ptr<EVP_PKEY> fromPkey );
 
   bool savePub( std::string path );
   bool savePri( std::string path, std::string pass );
@@ -60,16 +57,12 @@ std::shared_ptr<EVP_PKEY> rsa_pkey( int keyBits , int engine = NID_undef );
 std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine = NID_secp256k1 );
 
 
-std::shared_ptr<W_EVP_PKEY> w_pkey( std::string pemPath );
-std::shared_ptr<W_EVP_PKEY> w_empty_pkey();
-std::shared_ptr<W_EVP_PKEY> w_rsa_pkey( int keyBits = 4096 );
-
-
-
-
+std::shared_ptr<w_evp_pkey> w_pkey( std::string pemPath );
+std::shared_ptr<w_evp_pkey> w_empty_pkey();
+std::shared_ptr<w_evp_pkey> w_rsa_pkey( int keyBits = 4096 );
 
 
 };
-};
+
 
 #endif 

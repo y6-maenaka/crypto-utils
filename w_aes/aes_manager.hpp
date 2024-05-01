@@ -13,9 +13,8 @@
 
 #include "openssl/evp.h"
 
-namespace openssl_wrapper
-{
-namespace aes
+
+namespace cu
 {
 
 
@@ -57,10 +56,6 @@ public:
 };
 
 
-
-
-
-};
 };
 
 

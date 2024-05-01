@@ -1,22 +1,14 @@
-#include "../evp_pkey.h"
+#include "../evp_pkey.hpp"
 
 
-namespace openssl_wrapper
+namespace cu
 {
-namespace evp_pkey
-{
-
-
-
-
-
-
 
 
 bool case_1()
 {
   // std::shared_ptr<W_EVP_PKEY> wPkey = w_rsa_pkey();
-  std::shared_ptr<W_EVP_PKEY> wPkey = w_empty_pkey();
+  std::shared_ptr<w_evp_pkey> wPkey = w_empty_pkey();
   wPkey->loadPri( "./pri.pem" , "aaa" );
   // wPkey->loadPub( "./pri.pem" );
 
@@ -28,12 +20,4 @@ bool case_1()
 }
 
 
-
-
-
-
-
-
-
-};
 };
