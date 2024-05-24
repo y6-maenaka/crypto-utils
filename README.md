@@ -1,10 +1,18 @@
+<h1>crypto-utils: An OpenSSL Wrapper</h1>
+crypto-utils is a C++ library providing a collection of utilities for cryptographic operations. Serving as a wrapper for the OpenSSL Toolkit, it offers functionalities such as generating message digests using SHA2, AES encryption and decryption (CBC mode), Base64 encoding and decoding, RSA encryption, decryption, signing, and verification, as well as operations with EVP_PKEY structures.
+
+<hr>
+
+<h2>0. Installation</h2>
+
 ```cpp
 #include <crypto_utils.hpp>
 ```
 
 <hr>
 
-1. SHA2
+<h2>1. SHA2</h2>
+ 
 ```cpp
 std::string plain; // Use std::array< std::uint8_t, N>, std::vector<char> etc...
 
@@ -17,7 +25,8 @@ auto md512 = cu::sha2::hash<512>(plain);
 
 <hr>
 
-2. AES(only CBC)
+<h2>2. AES(only CBC)</h2>
+
 ```cpp
 std::string key_from = "ABCDEFGHIJKLMNOP"; // Use std::array< std::uint8_t, N >. std::vector<char> etc...\
 
@@ -34,7 +43,8 @@ auto plain: auto = cu::aes::decrypt<16>( cipher, key );
 
 <hr>
 
-3. Base64
+<h2>3. Base64</h2>
+ 
 ```cpp
 std::string plain = "HelloWorld"; // Use std::array< std::uint8_t, N >. std::vector<char> etc...\
 
@@ -46,7 +56,8 @@ auto decoded = u::base64::decode( encoded );
 
 <hr>
 
-4. RSA
+<h2>4. RSA</h2>
+
 ```cpp
 std::string plain = "HelloWorld"; // Use std::array< std::uint8_t, N >. std::vector<char> etc...\
 
@@ -66,7 +77,8 @@ bool verification = cu::rsa::verify( &pkey, sign, plain );
 
 <hr>
 
-5. EVP_PKEY
+<h2>5. EVP_PKEY</h2>
+
 ```cpp
 /* Generate evp_pkey */
 cu::evp_pkey pkey = cu::evp_pkey::empty();
@@ -83,5 +95,6 @@ bool loaded_pri = pkey.load_prikey( "./pri.pem", "pass" );
 
 <hr> 
 
-<p>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (<a>https://www.openssl.org/</a>)</p>
+<h2>License</h2>
+<p>This product includes software developed by the OpenSSL Project for use in the <a href="https://www.openssl.org/">OpenSSL Toolkit</a>.</p>
 <p>Copyright (c) 1998-2011 The OpenSSL Project. All rights reserved.</p>
