@@ -12,6 +12,7 @@
 
 #include "openssl/evp.h"
 #include "openssl/aes.h"
+#include "./common.hpp"
 
 
 namespace cu
@@ -53,8 +54,8 @@ public:
   };
 
 public:
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> encrypt( const Container &input, const aes::key<N> &key );
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> decrypt( const Container &input, const aes::key<N> &key );
+  template < std::size_t N, typename Container > static inline std::vector<std::byte> encrypt( const Container &plain, const aes::key<N> &key );
+  template < std::size_t N, typename Container > static inline std::vector<std::byte> decrypt( const Container &cipher, const aes::key<N> &key );
   template < std::size_t N > static inline std::size_t get_encrypt_length( std::size_t plain_bin_length );
 };
 
@@ -94,7 +95,7 @@ template < std::size_t N > inline void aes::key<N>::print() const
   std::cout << "\n";
 }
 
-template < std::size_t N, typename Container> inline std::vector<std::byte> aes::encrypt( const Container &input, const aes::key<N> &key )
+template < std::size_t N, typename Container> inline std::vector<std::byte> aes::encrypt( const Container &plain, const aes::key<N> &key )
 {
   std::vector<std::byte> ret; 
 
@@ -105,9 +106,9 @@ template < std::size_t N, typename Container> inline std::vector<std::byte> aes:
 	return std::vector<std::byte>();
   } 
 
-  ret.resize( aes::get_encrypt_length<N>(input.size()) );
+  ret.resize( aes::get_encrypt_length<N>(plain.size()) );
   int unpadded_cipher_bin_len = 0;
-  if( EVP_EncryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_cipher_bin_len, reinterpret_cast<const unsigned char*>(input.data()), input.size() ) <= 0 ) {
+  if( EVP_EncryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_cipher_bin_len, reinterpret_cast<const unsigned char*>(plain.data()), plain.size() ) <= 0 ) {
 	EVP_CIPHER_CTX_free( cctx );
 	return std::vector<std::byte>();
   }
@@ -122,7 +123,7 @@ template < std::size_t N, typename Container> inline std::vector<std::byte> aes:
   return ret;
 }
 
-template < std::size_t N, typename Container > inline std::vector<std::byte> aes::decrypt( const Container &input, const aes::key<N> &key )
+template < std::size_t N, typename Container > inline std::vector<std::byte> aes::decrypt( const Container &cipher, const aes::key<N> &key )
 {
   std::vector<std::byte> ret;
 
@@ -133,9 +134,9 @@ template < std::size_t N, typename Container > inline std::vector<std::byte> aes
 	return std::vector<std::byte>();
   }
 
-  ret.resize( input.size() ); // 後でスライスする
+  ret.resize( cipher.size() ); // 後でスライスする
   int unpadded_plain_len = 0;
-  if( EVP_DecryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_plain_len, reinterpret_cast<const unsigned char*>(input.data()), input.size() ) <= 0 ){
+  if( EVP_DecryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_plain_len, reinterpret_cast<const unsigned char*>(cipher.data()), cipher.size() ) <= 0 ){
 	EVP_CIPHER_CTX_free( cctx );
 	return std::vector<std::byte>();
   }

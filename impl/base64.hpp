@@ -12,20 +12,20 @@
 #include "openssl/bio.h"
 #include "openssl/evp.h"
 #include "openssl/buffer.h"
+#include "./common.hpp"
 
 
 namespace cu
 {
 
 
-template< typename Container > constexpr bool is_allowed_input_container() { // 指定した鍵の作成元が許可されているデータタイプか?
+/* template< typename Container > constexpr bool is_allowed_input_container() { // 指定した鍵の作成元が許可されているデータタイプか?
   return (
 	std::is_same_v< Container, std::vector<std::byte>> 
 	|| std::is_same_v< Container, std::vector<std::uint8_t> >
 	|| std::is_same_v< Container, std::string> 
   );
-}
-
+} */
 
 class base64
 {
@@ -41,7 +41,7 @@ namespace {
 
 template < typename Container > inline std::vector<std::byte> base64::encode( const Container &input )
 {
-  static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
+  // static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
 
   std::unique_ptr<BIO, BIOFreeAll > b64(BIO_new(BIO_f_base64()));
   BIO_set_flags(b64.get(), BIO_FLAGS_BASE64_NO_NL );  // 改行を挿入しない
@@ -62,7 +62,7 @@ template < typename Container > inline std::vector<std::byte> base64::encode( co
 
 template < typename Container > inline std::vector<std::byte> base64::decode( const Container &input )
 {
-  static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
+  // static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
 
   std::unique_ptr<BIO, BIOFreeAll > b64(BIO_new(BIO_f_base64())); // デコーダの作成
   BIO_set_flags(b64.get(), BIO_FLAGS_BASE64_NO_NL ); // 改行しない

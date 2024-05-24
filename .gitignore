@@ -9,5 +9,5 @@
 build/*
 
 .config/ecdsa_private_key.pem
-./main.cpp
+main.cpp
 test/*

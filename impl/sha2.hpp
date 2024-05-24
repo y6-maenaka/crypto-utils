@@ -10,6 +10,7 @@
 #include <type_traits>
 
 #include "openssl/evp.h"
+#include "./common.hpp"
 
 
 namespace cu
