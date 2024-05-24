@@ -4,9 +4,10 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <algorithm>
+#include <type_traits>
 
 #include "openssl/evp.h"
-#include "openssl/rsa.h"
 #include "openssl/bio.h"
 #include "openssl/pem.h"
 
@@ -15,51 +16,44 @@ namespace cu
 {
 
 
+using EVP_PKEY_ref = std::shared_ptr<EVP_PKEY>;
 class evp_pkey
 {
-private:
-  std::shared_ptr<EVP_PKEY> _body = nullptr;
-
-  int _status;
-  std::string _keyType;
-
 public:
-  void pkey( std::shared_ptr<EVP_PKEY> fromPkey );
-  
   evp_pkey();
-  evp_pkey( std::string pemPath );
-  evp_pkey( std::shared_ptr<EVP_PKEY> fromPkey );
+  evp_pkey( EVP_PKEY_ref from );
 
-  bool savePub( std::string path );
-  bool savePri( std::string path, std::string pass );
+  inline bool save_pubkey( const std::string &path ) const;
+  inline bool save_prikey( const std::string &path, const std::string &pass = "" ) const;
 
-  bool loadPub( std::string path );
-  bool loadPri( std::string path, std::string pass );
+  inline bool load_pubkey( const std::string &path );
+  inline bool load_prikey( const std::string &path, const std::string &pass = "" );
+  
+  static inline evp_pkey (empty)();
+  inline EVP_PKEY *get();
 
-  std::shared_ptr<EVP_PKEY> pkey();
-  EVP_PKEY* rawPkey();
-
-  int type();
+  void set_PKEY( std::shared_ptr<EVP_PKEY> from );
   void print() const;
-};
 
+private:
+  EVP_PKEY_ref _body{nullptr};
+};
 
 struct EVP_PKEY_deleter
 {
-  void operator ()(EVP_PKEY* key) const {
-	EVP_PKEY_free(key);
+  void operator()(EVP_PKEY *pkey) const{
+	EVP_PKEY_free(pkey);
   }
 };
 
 
-std::shared_ptr<EVP_PKEY> empty_pkey();
-std::shared_ptr<EVP_PKEY> rsa_pkey( int keyBits , int engine = NID_undef );
-std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine = NID_secp256k1 );
+using rsa_EVP_PKEY_ref = std::shared_ptr<EVP_PKEY>;
+inline rsa_EVP_PKEY_ref generate_rsa_EVP_PKEY_ref( int key_bits, int engine = NID_secp256k1 );
+using ecdsa_EVP_PKEY_ref = std::shared_ptr<EVP_PKEY>;
+inline ecdsa_EVP_PKEY_ref generate_ecdsa_EVP_PKEY_ref( int engine = NID_secp256k1 );
 
-
-std::shared_ptr<evp_pkey> w_pkey( std::string pemPath );
-std::shared_ptr<evp_pkey> w_empty_pkey();
-std::shared_ptr<evp_pkey> w_rsa_pkey( int keyBits = 4096 );
+inline evp_pkey generate_rsa_evp_pkey( int key_bits, int engine = NID_secp256k1 );
+inline evp_pkey generate_ecdsa_evp_pkey( int key_bits = 4096 );
 
 
 evp_pkey::evp_pkey()
@@ -67,88 +61,109 @@ evp_pkey::evp_pkey()
   return;
 }
 
-evp_pkey::evp_pkey( std::string pemPath )
+evp_pkey::evp_pkey( EVP_PKEY_ref from )
 {
-  return;
+  _body = from;
 }
 
-evp_pkey::evp_pkey( std::shared_ptr<EVP_PKEY> fromPkey )
+inline bool evp_pkey::save_pubkey( const std::string &path ) const
 {
-  _body = fromPkey;
-}
+  BIO *write_bio_fp = nullptr;
+  if( (write_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
+	BIO_vfree( write_bio_fp );
+	return false;
+  }
+  if( (write_bio_fp = BIO_new_file( path.c_str() , "w" )) == nullptr ){
+	BIO_vfree( write_bio_fp );
+	return false;
+  }
 
-bool evp_pkey::savePub( std::string path )
-{
-  BIO *write_bio_fp;
-  write_bio_fp = BIO_new( BIO_s_file() );
-  write_bio_fp = BIO_new_file( path.c_str() , "w" );
-
-  PEM_write_bio_PUBKEY( write_bio_fp , _body.get() );
+  if( PEM_write_bio_PUBKEY( write_bio_fp , _body.get() ) <= 0 ){
+	BIO_vfree( write_bio_fp );
+	return false;
+  }
 
   BIO_vfree( write_bio_fp );
   return true;
 }
 
-bool evp_pkey::savePri( std::string path, std::string pass )
+inline bool evp_pkey::save_prikey( const std::string &path, const std::string &pass ) const
 {
-  BIO* write_bio_fp;
-  write_bio_fp = BIO_new( BIO_s_file() );
-  write_bio_fp = BIO_new_file( path.c_str() , "w" );
+  BIO* write_bio_fp = nullptr;
+  if( (write_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
+	BIO_vfree( write_bio_fp );
+	return false;
+  }
+  if( (write_bio_fp = BIO_new_file( path.c_str() ,"w" )) == nullptr ){
+	BIO_vfree( write_bio_fp );
+	return false;
+  }
 
-  if( pass.size() > 0 )
-	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), pass.c_str() , pass.size() , NULL , NULL);
+  if( (pass.size()) <= 0 )
+	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), pass.c_str() , pass.size() , nullptr , nullptr );
   else
-	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), NULL, 0 , NULL , NULL);
+	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), nullptr, 0 , nullptr , nullptr );
 	
   BIO_vfree( write_bio_fp );
   return true;
 }
 
-
-
-bool evp_pkey::loadPub( std::string path )
+inline bool evp_pkey::load_pubkey( const std::string &path )
 {
-  BIO *read_bio_fp = NULL;
-  read_bio_fp = BIO_new( BIO_s_file() );
+  BIO *read_bio_fp = nullptr;
+  if( (read_bio_fp = BIO_new( BIO_s_file())) == nullptr ){
+	BIO_vfree( read_bio_fp );
+	return false;
+  }
 
-  read_bio_fp = BIO_new_file( path.c_str() ,"r");
-  if( read_bio_fp == nullptr ) return false;
+  if( (read_bio_fp = BIO_new_file( path.c_str() ,"r")) == nullptr ){
+	BIO_vfree( read_bio_fp );
+	return false;
+  }
 
-  _body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PUBKEY( read_bio_fp , NULL, NULL, NULL ) , EVP_PKEY_deleter() );
+  _body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PUBKEY( read_bio_fp , nullptr, nullptr, nullptr ) , EVP_PKEY_deleter() );
 
   BIO_vfree( read_bio_fp );
   return true;
 }
-bool evp_pkey::loadPri( std::string path, std::string pass )
-{
-  BIO *read_bio_fp = NULL;
-  read_bio_fp = BIO_new( BIO_s_file() );
 
-  read_bio_fp = BIO_new_file( path.c_str() ,"r");
-  if( read_bio_fp == nullptr ) return false;
+inline bool evp_pkey::load_prikey( const std::string &path, const std::string &pass )
+{
+  BIO *read_bio_fp = nullptr;
+  if( (read_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
+	BIO_vfree( read_bio_fp );
+	return false;
+  }
+
+  if( (read_bio_fp = BIO_new_file( path.c_str() ,"r")) == nullptr ){
+	BIO_vfree( read_bio_fp );
+	return false;
+  }
   
-  std::shared_ptr<evp_pkey> ret = std::make_shared<evp_pkey>();
-
-  if( pass.size() > 0 )
-	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , NULL, NULL, (char *)pass.c_str() ), EVP_PKEY_deleter() );
+  if( (pass.size()) <= 0 )
+	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , nullptr, nullptr, (char *)pass.c_str() ), EVP_PKEY_deleter() );
   else
-	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , NULL, NULL, NULL ) , EVP_PKEY_deleter() );
+	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , nullptr, nullptr, nullptr ) , EVP_PKEY_deleter() );
 
   BIO_vfree( read_bio_fp );
   return true;
-
 }
 
-std::shared_ptr<EVP_PKEY> evp_pkey::pkey()
+inline EVP_PKEY* evp_pkey::get()
 {
-  return _body;
+  return _body.get();
 }
 
-EVP_PKEY* evp_pkey::rawPkey()
+evp_pkey inline evp_pkey::empty()
 {
-  return this->pkey().get();
+  evp_pkey ret;
+  return ret;
 }
 
+void evp_pkey::set_PKEY( std::shared_ptr<EVP_PKEY> from )
+{
+  _body = from;
+}
 
 void evp_pkey::print() const
 {
@@ -165,93 +180,47 @@ void evp_pkey::print() const
 }
 
 
-void evp_pkey::pkey( std::shared_ptr<EVP_PKEY> fromPkey )
+inline rsa_EVP_PKEY_ref generate_rsa_EVP_PKEY_ref( int key_bits, int engine )
 {
-  _body = fromPkey;
-}
-
-
-std::shared_ptr<EVP_PKEY> empty_pkey()
-{
-  EVP_PKEY *pkey = EVP_PKEY_new();
-  return std::shared_ptr<EVP_PKEY>(pkey, EVP_PKEY_deleter() );
-}
-
-
-std::shared_ptr<EVP_PKEY> rsa_pkey( int keyBits, int engine )
-{
-  EVP_PKEY *pkey = nullptr;
+  EVP_PKEY *PKEY = nullptr;
   EVP_PKEY_CTX *pctx;
 
-  pkey = EVP_PKEY_new();
-  if( pkey == nullptr ) return nullptr;
+  if( (PKEY = EVP_PKEY_new()) == nullptr ) return nullptr;
 
-  pctx = EVP_PKEY_CTX_new_id( EVP_PKEY_RSA, NULL );
-  if( pctx == nullptr ) return nullptr;
+  if( (pctx = EVP_PKEY_CTX_new_id( EVP_PKEY_RSA, NULL )) == nullptr ){
+	EVP_PKEY_CTX_free( pctx );
+	return nullptr;
+  }
 
   if( EVP_PKEY_keygen_init( pctx ) <= 0 ){
 	EVP_PKEY_CTX_free(pctx);
 	return nullptr;
   }
 
-  if( EVP_PKEY_CTX_set_rsa_keygen_bits( pctx, keyBits ) <= 0 )
+  if( EVP_PKEY_CTX_set_rsa_keygen_bits( pctx, key_bits ) <= 0 )
   {
 	EVP_PKEY_CTX_free( pctx );
 	return nullptr;
   }
 
-  /*
-  if( EVP_PKEY_CTX_set_default_rng_nid( pctx , engine ) )
-  {
-	EVP_PKEY_CTX_free( pctx );
-	return nullptr;
-  }
-  */
-
-  if( EVP_PKEY_keygen( pctx , &pkey ) <= 0 )
+  if( EVP_PKEY_keygen( pctx , &PKEY ) <= 0 )
   {
 	EVP_PKEY_CTX_free( pctx );
 	return nullptr;
   }
 
   EVP_PKEY_CTX_free( pctx );
-  return std::shared_ptr<EVP_PKEY>(pkey, EVP_PKEY_deleter() );
+  return std::shared_ptr<EVP_PKEY>(PKEY, EVP_PKEY_deleter() );
 }
 
-
-std::shared_ptr<EVP_PKEY> ecdsa_pkey( int engine )
+inline evp_pkey generate_rsa_evp_pkey( int key_bits, int engine )
 {
-  /*
-  EVP_PKEY *pkey = nullptr;
-  EVP_PKEY_CTX *pctx;
-
-  pkey = EVP_PKEY_new();
-  pctx = EVP_PKEY_CTX_new_id( EVP_PKEY_EC,  NULL );
-
-  */
-  return nullptr;
-}
-
-
-std::shared_ptr<evp_pkey> w_empty_pkey()
-{
-  std::shared_ptr<evp_pkey> ret = std::make_shared<evp_pkey>( empty_pkey() );
-  // std::shared_ptr<EVP_PKEY> pkey = empty_pkey();
-  // ret->pkey( pkey );
+  evp_pkey ret = evp_pkey::empty();
+  auto PKEY = generate_rsa_EVP_PKEY_ref(key_bits);
+  ret.set_PKEY( PKEY );
 
   return ret;
 }
-
-std::shared_ptr<evp_pkey> w_rsa_pkey( int keyBits )
-{
-  std::shared_ptr<evp_pkey> ret = std::make_shared<evp_pkey>( rsa_pkey(keyBits) );
-  //std::shared_ptr<EVP_PKEY> pkey = rsa_pkey( keyBits );
-  // ret->pkey( pkey );
-
-  return ret;
-}
-
-
 
 
 };
