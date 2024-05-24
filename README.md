@@ -34,9 +34,9 @@ std::string key_from = "ABCDEFGHIJKLMNOP"; // Use std::array< std::uint8_t, N >.
 cu::aes::key<16> key( key_from );
 
 /* Encrypt */
-auto cipher: auto = cu::aes::encrypt<16>( plain_str, key );
+auto cipher = cu::aes::encrypt<16>( plain_str, key );
 /* Decrypt */
-auto plain: auto = cu::aes::decrypt<16>( cipher, key );
+auto plain = cu::aes::decrypt<16>( cipher, key );
 
 // ※ Allowed key lengths: 16, 24, 32 [bytes]
 ```
