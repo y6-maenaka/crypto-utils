@@ -4,16 +4,17 @@
 // #include "./base64.hpp"
 // #include "./sha.hpp"
 // #include "./evp_pkey.hpp"
-#include "./aes.hpp"
+#include "./crypto_utils.hpp"
 // #include "./rsa.hpp"
 
 #include "./test/setup_aes.cpp"
+#include "./test/setup_base64.cpp"
 
 
 int main()
 {
 
-
+  return setup_base64();
   return setup_aes();
 
 

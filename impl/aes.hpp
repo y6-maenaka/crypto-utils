@@ -23,10 +23,11 @@ constexpr std::size_t AES_CBC_128_KEY_LENGTH_BYTES = 16;
 constexpr std::size_t AES_CBC_192_KEY_LENGTH_BYTES = 24;
 constexpr std::size_t AES_CBC_256_KEY_LENGTH_BYTES = 32;
 
-constexpr bool is_valid_key_length(std::size_t n) { // 指定した鍵長が許可されている長さか?
+constexpr bool is_allowed_key_length(std::size_t n) { // 指定した鍵長が許可されている長さか?
   return (( n == AES_CBC_128_KEY_LENGTH_BYTES || n == AES_CBC_192_KEY_LENGTH_BYTES || n == AES_CBC_256_KEY_LENGTH_BYTES ));
 }
-template< typename Container, std::size_t N > constexpr bool is_valid_key_from() { // 指定した鍵の作成元が許可されているデータタイプか?
+
+template< typename Container, std::size_t N > constexpr bool is_allowed_container() { // 指定した鍵の作成元が許可されているデータタイプか?
   return (
 	std::is_same_v< Container, std::vector<std::byte>> 
 	|| std::is_same_v< Container, std::array<std::byte, N>> 
@@ -40,7 +41,7 @@ template< typename Container, std::size_t N > constexpr bool is_valid_key_from()
 template < std::size_t N >
 class aes_key
 {
-  static_assert( is_valid_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
+  static_assert( is_allowed_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
 private:
   std::array< std::byte, N > _key;
 
@@ -75,7 +76,7 @@ template < std::size_t N >
 template < typename Container >
 aes_key<N>::aes_key( const Container &key_from_c ) // only support CBC mode
 {
-  static_assert( is_valid_key_from<Container, N>(),"Invalid key container type");
+  static_assert( is_allowed_container<Container, N>(),"Invalid key container type");
   if( key_from_c.size() != N ) throw std::invalid_argument("Invalid key size");
   std::transform( key_from_c.begin(), key_from_c.end(), _key.begin(), [](const char& cc){
 	  return std::byte(cc);
@@ -154,7 +155,7 @@ template < std::size_t N, typename Container > inline std::vector<std::byte> aes
 
 template< std::size_t N > inline std::size_t aes_manager::get_encrypt_length( std::size_t plain_bin_length ) 
 {
-  static_assert( is_valid_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
+  static_assert( is_allowed_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
 
   std::size_t ret = floor( plain_bin_length / AES_CBC_BLOCK_SIZE_BYTES ) * AES_CBC_BLOCK_SIZE_BYTES;
   return ret + AES_CBC_BLOCK_SIZE_BYTES;
