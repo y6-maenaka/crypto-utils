@@ -9,13 +9,15 @@
 
 #include "./test/setup_aes.cpp"
 #include "./test/setup_base64.cpp"
+#include "./test/setup_sha.cpp"
 
 
 int main()
 {
 
-  return setup_base64();
+  return setup_sha();
   return setup_aes();
+  return setup_base64();
 
 
 

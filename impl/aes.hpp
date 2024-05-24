@@ -38,26 +38,23 @@ template< typename Container, std::size_t N > constexpr bool is_allowed_containe
 }
 
 
-template < std::size_t N >
-class aes_key
-{
-  static_assert( is_allowed_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
-private:
-  std::array< std::byte, N > _key;
-
-
-public:
-  template < typename Container > aes_key( const Container &key_from_c );
-  inline const std::uint8_t* get_raw() const;
-
-  inline void print() const;
-};
-
-class aes_manager
+class aes
 {
 public:
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> encrypt( const Container &input, const aes_key<N> &key );
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> decrypt( const Container &input, const aes_key<N> &key );
+  template< std::size_t N > class key
+  {
+	public:
+	  template < typename Container > key( const Container &key_from_c );
+	  inline const std::uint8_t* get_raw() const;
+	  inline void print() const;
+
+	private:
+	  std::array< std::byte, N > _body;
+  };
+
+public:
+  template < std::size_t N, typename Container > static inline std::vector<std::byte> encrypt( const Container &input, const aes::key<N> &key );
+  template < std::size_t N, typename Container > static inline std::vector<std::byte> decrypt( const Container &input, const aes::key<N> &key );
   template < std::size_t N > static inline std::size_t get_encrypt_length( std::size_t plain_bin_length );
 };
 
@@ -74,30 +71,30 @@ const EVP_CIPHER* get_evp_cipher(int n)
 
 template < std::size_t N >
 template < typename Container >
-aes_key<N>::aes_key( const Container &key_from_c ) // only support CBC mode
+aes::key<N>::key( const Container &key_from_c ) // only support CBC mode
 {
   static_assert( is_allowed_container<Container, N>(),"Invalid key container type");
   if( key_from_c.size() != N ) throw std::invalid_argument("Invalid key size");
-  std::transform( key_from_c.begin(), key_from_c.end(), _key.begin(), [](const char& cc){
+  std::transform( key_from_c.begin(), key_from_c.end(), _body.begin(), [](const char& cc){
 	  return std::byte(cc);
 	  } );
 }
 
-template < std::size_t N > inline const std::uint8_t* aes_key<N>::get_raw() const
+template < std::size_t N > inline const std::uint8_t* aes::key<N>::get_raw() const
 {
-  return reinterpret_cast<const std::uint8_t*>(_key.data());
+  return reinterpret_cast<const std::uint8_t*>(_body.data());
 }
 
-template < std::size_t N > inline void aes_key<N>::print() const
+template < std::size_t N > inline void aes::key<N>::print() const
 {
   std::cout << "[ key length ] : " << N << "\n";
 
   std::cout << "[ key hex ] : 0x"; 
-  for( auto &itr : _key ) printf("%02hhx", itr ); 
+  for( auto &itr : _body ) printf("%02hhx", itr ); 
   std::cout << "\n";
 }
 
-template < std::size_t N, typename Container> inline std::vector<std::byte> aes_manager::encrypt( const Container &input, const aes_key<N> &key )
+template < std::size_t N, typename Container> inline std::vector<std::byte> aes::encrypt( const Container &input, const aes::key<N> &key )
 {
   std::vector<std::byte> ret; 
 
@@ -108,7 +105,7 @@ template < std::size_t N, typename Container> inline std::vector<std::byte> aes_
 	return std::vector<std::byte>();
   } 
 
-  ret.resize( aes_manager::get_encrypt_length<N>(input.size()) );
+  ret.resize( aes::get_encrypt_length<N>(input.size()) );
   int unpadded_cipher_bin_len = 0;
   if( EVP_EncryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_cipher_bin_len, reinterpret_cast<const unsigned char*>(input.data()), input.size() ) <= 0 ) {
 	EVP_CIPHER_CTX_free( cctx );
@@ -125,7 +122,7 @@ template < std::size_t N, typename Container> inline std::vector<std::byte> aes_
   return ret;
 }
 
-template < std::size_t N, typename Container > inline std::vector<std::byte> aes_manager::decrypt( const Container &input, const aes_key<N> &key )
+template < std::size_t N, typename Container > inline std::vector<std::byte> aes::decrypt( const Container &input, const aes::key<N> &key )
 {
   std::vector<std::byte> ret;
 
@@ -153,7 +150,7 @@ template < std::size_t N, typename Container > inline std::vector<std::byte> aes
   return ret;
 }
 
-template< std::size_t N > inline std::size_t aes_manager::get_encrypt_length( std::size_t plain_bin_length ) 
+template< std::size_t N > inline std::size_t aes::get_encrypt_length( std::size_t plain_bin_length ) 
 {
   static_assert( is_allowed_key_length(N) , "AES key length must be 128, 192 or 256 bits" );
 
