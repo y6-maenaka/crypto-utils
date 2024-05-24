@@ -1,14 +1,38 @@
-#include "rsa_manager.hpp"
+#ifndef F71D9744_2F6F_4A69_A671_C924DAC6E5CE
+#define F71D9744_2F6F_4A69_A671_C924DAC6E5CE
 
-#include "../w_evp_pkey/evp_pkey.hpp"
-#include "../w_sha/sha.hpp"
+#include <iostream>
+#include <memory>
+
+#include "openssl/evp.h"
+#include "openssl/rsa.h"
+#include "openssl/engine.h"
+
+#include "./evp_pkey.hpp"
+#include "./sha.hpp"
 
 
 namespace cu
 {
 
 
-std::size_t w_rsa_manager::encrypt( w_evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength ,std::shared_ptr<unsigned char> *cipherBin )
+class evp_pkey;
+
+
+class rsa_manager
+{
+public:
+  static inline std::size_t encrypt( evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength ,std::shared_ptr<unsigned char> *cipherBin );
+  static inline jstd::size_t sign( evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength ,std::shared_ptr<unsigned char> *signBin );
+
+  static inline std::size_t decrypt( evp_pkey* wpkey , const unsigned char* cipherBin , const std::size_t cipherBinLength ,std::shared_ptr<unsigned char> *plainBin );
+  static inline bool verify( evp_pkey* wpkey , const unsigned char* signBin , const std::size_t signBinLength , const unsigned char* msgBin /* ハッシュ前の本体バイナリ */ , const std::size_t msgBinLength );
+
+  // void decrypt( evp_pkey::W_EVP_PKEY );
+};
+
+
+std::size_t rsa_manager::encrypt( evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength ,std::shared_ptr<unsigned char> *cipherBin )
 {
   EVP_PKEY_CTX *pctx = nullptr;
   std::size_t outLength;
@@ -45,7 +69,7 @@ std::size_t w_rsa_manager::encrypt( w_evp_pkey* wpkey , const unsigned char* pla
 }
 
 
-std::size_t w_rsa_manager::sign( w_evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength , std::shared_ptr<unsigned char> *signBin )
+std::size_t rsa_manager::sign( evp_pkey* wpkey , const unsigned char* plainBin , const std::size_t plainBinLength , std::shared_ptr<unsigned char> *signBin )
 {
   std::size_t outLength = 0;
   std::shared_ptr<unsigned char> md; std::size_t mdLength;
@@ -78,7 +102,7 @@ std::size_t w_rsa_manager::sign( w_evp_pkey* wpkey , const unsigned char* plainB
 }
 
 
-std::size_t w_rsa_manager::decrypt( w_evp_pkey* wpkey , const unsigned char* cipherBin , const std::size_t cipherBinLength ,std::shared_ptr<unsigned char> *plainBin )
+std::size_t rsa_manager::decrypt( evp_pkey* wpkey , const unsigned char* cipherBin , const std::size_t cipherBinLength ,std::shared_ptr<unsigned char> *plainBin )
 {
   EVP_PKEY_CTX *pctx = nullptr;
   std::size_t outLength;
@@ -115,7 +139,7 @@ std::size_t w_rsa_manager::decrypt( w_evp_pkey* wpkey , const unsigned char* cip
 }
 
 
-bool w_rsa_manager::verify( w_evp_pkey* wpkey , const unsigned char* signBin , const std::size_t signBinLength , const unsigned char* msgBin, const std::size_t msgBinLength )
+bool rsa_manager::verify( evp_pkey* wpkey , const unsigned char* signBin , const std::size_t signBinLength , const unsigned char* msgBin, const std::size_t msgBinLength )
 {
   if( signBin == nullptr || signBinLength <= 0 ) return false;
   if( msgBin == nullptr || msgBinLength <= 0 ) return false;
@@ -141,3 +165,6 @@ bool w_rsa_manager::verify( w_evp_pkey* wpkey , const unsigned char* signBin , c
 
 
 };
+
+
+#endif 

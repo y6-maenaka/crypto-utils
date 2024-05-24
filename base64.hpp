@@ -1,14 +1,27 @@
-#include "base64.hpp"
+#ifndef C9E589D5_A6E7_42C7_9927_5DF6E261BED1
+#define C9E589D5_A6E7_42C7_9927_5DF6E261BED1
 
+
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "openssl/bio.h"
 #include "openssl/evp.h"
 #include "openssl/buffer.h"
 
 
-
 namespace cu
 {
+
+
+class base64
+{
+public:
+  static inline std::string encode( const unsigned char* from , const std::size_t fromLength );
+  static inline std::vector<unsigned char> decode( const unsigned char* from , const std::size_t fromLength );
+};
 
 
 namespace {
@@ -16,7 +29,7 @@ namespace {
 }
 
 
-std::string w_base64::encode( const unsigned char* from , const std::size_t fromLength )
+std::string base64::encode( const unsigned char* from , const std::size_t fromLength )
 {
 
   std::unique_ptr<BIO, BIOFreeAll > b64(BIO_new(BIO_f_base64()));
@@ -35,7 +48,7 @@ std::string w_base64::encode( const unsigned char* from , const std::size_t from
   return ret;
 }
 
-std::vector<unsigned char> w_base64::decode( const unsigned char* from , const std::size_t fromLength )
+std::vector<unsigned char> base64::decode( const unsigned char* from , const std::size_t fromLength )
 {
   std::unique_ptr<BIO, BIOFreeAll > b64(BIO_new(BIO_f_base64())); // デコーダの作成
   BIO_set_flags(b64.get(), BIO_FLAGS_BASE64_NO_NL ); // 改行しない
@@ -51,7 +64,10 @@ std::vector<unsigned char> w_base64::decode( const unsigned char* from , const s
   return ret;
 }
 
-// referenced from https://stackoverflow.com/questions/5288076/base64-encoding-and-decoding-with-openssl
-
 
 };
+
+
+#endif 
+
+
