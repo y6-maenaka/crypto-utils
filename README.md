@@ -91,6 +91,8 @@ bool saved_pri = pkey.save_prikey( "./pri.pem", "pass" );
 /* Load evp_pkey( private and public ) */
 bool loaded_pub = pkey.load_pubkey( "./pub.pem" );
 bool loaded_pri = pkey.load_prikey( "./pri.pem", "pass" );
+
+EVP_PKY* pkey.get();
 ```
 
 <hr> 
