@@ -3,10 +3,23 @@ crypto-utils is a C++ library providing a collection of utilities for cryptograp
 
 <hr>
 
-<h2>0. Installation</h2>
+<h2>Installation</h2>
 
 ```cpp
 #include <crypto_utils.hpp>
+```
+
+<hr>
+
+<h2>Compilation</h2>
+
+g++
+```
+g++ your_source.cpp -lssl -lcrypto
+```
+cmake
+```cmake
+target_link_libraries( your_project ○○○　${OPENSSL_LIBRARIES}　
 ```
 
 <hr>
