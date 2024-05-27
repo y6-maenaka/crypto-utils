@@ -19,17 +19,18 @@ g++ your_source.cpp -lssl -lcrypto
 ```
 cmake
 ```cmake
-target_link_libraries( your_project ○○○　${OPENSSL_LIBRARIES}　
+target_link_libraries( your_project ○○○　${OPENSSL_LIBRARIES}　)
 ```
 
 <hr>
 
-<h2>1. SHA2</h2>
+<h2>1. SHA1/2</h2>
  
 ```cpp
 std::string plain; // Use std::array< std::uint8_t, N>, std::vector<char> etc...
 
 /* Generate message digest */
+auto md160 = cu::sha1::hash(plain);
 auto md224 = cu::sha2::hash<224>(plain);
 auto md256 = cu::sha2::hash<256>(plain);
 auto md384 = cu::sha2::hash<384>(plain);
