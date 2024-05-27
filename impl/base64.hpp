@@ -12,7 +12,7 @@
 #include "openssl/bio.h"
 #include "openssl/evp.h"
 #include "openssl/buffer.h"
-#include "./common.hpp"
+#include "./result.hpp"
 
 
 namespace cu
@@ -30,8 +30,8 @@ namespace cu
 class base64
 {
 public:
-  template < typename Container > static inline std::vector<std::byte> encode( const Container &input );
-  template < typename Container > static inline std::vector<std::byte> decode( const Container &input );
+  template < typename Container > static inline cu_result encode( const Container &input );
+  template < typename Container > static inline cu_result decode( const Container &input );
 };
 
 namespace {
@@ -39,7 +39,7 @@ namespace {
 }
 
 
-template < typename Container > inline std::vector<std::byte> base64::encode( const Container &input )
+template < typename Container > inline cu_result base64::encode( const Container &input )
 {
   // static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
 
@@ -55,12 +55,12 @@ template < typename Container > inline std::vector<std::byte> base64::encode( co
   const char* ret_temp;
   std::size_t ret_len = BIO_get_mem_data( bio , &ret_temp );
 
-  std::vector<std::byte> ret; 
-  ret.assign(reinterpret_cast<const std::byte*>(ret_temp), reinterpret_cast<const std::byte*>(ret_temp + ret_len));
+  cu_result ret = cu_result::empty(); 
+  (*ret).assign(reinterpret_cast<const cu_result::value_type*>(ret_temp), reinterpret_cast<const cu_result::value_type*>(ret_temp + ret_len));
   return ret;
 }
 
-template < typename Container > inline std::vector<std::byte> base64::decode( const Container &input )
+template < typename Container > inline cu_result base64::decode( const Container &input )
 {
   // static_assert( is_allowed_input_container<Container>(), "Invaild input container type" );
 
@@ -71,9 +71,9 @@ template < typename Container > inline std::vector<std::byte> base64::decode( co
   BIO_push( b64.get(), source ); // 結合
   
   const int max_len  = input.size() / 4 * 3 + 1;
-  std::vector<std::byte> ret; ret.resize( max_len );
-  const int ret_len = BIO_read( b64.get(), ret.data(), max_len );
-  ret.resize(ret_len);
+  cu_result ret = cu_result::empty(); (*ret).resize( max_len );
+  const int ret_len = BIO_read( b64.get(), (*ret).data(), max_len );
+  (*ret).resize(ret_len);
 
   return ret;
 }

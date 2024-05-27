@@ -12,7 +12,7 @@
 
 #include "openssl/evp.h"
 #include "openssl/aes.h"
-#include "./common.hpp"
+#include "./result.hpp"
 
 
 namespace cu
@@ -42,6 +42,8 @@ template< typename Container, std::size_t N > constexpr bool is_allowed_containe
 class aes
 {
 public:
+  using value_type = std::byte;
+
   template< std::size_t N > class key
   {
 	public:
@@ -50,12 +52,12 @@ public:
 	  inline void print() const;
 
 	private:
-	  std::array< std::byte, N > _body;
+	  std::array< value_type, N > _body;
   };
 
 public:
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> encrypt( const Container &plain, const aes::key<N> &key );
-  template < std::size_t N, typename Container > static inline std::vector<std::byte> decrypt( const Container &cipher, const aes::key<N> &key );
+  template < std::size_t N, typename Container > static inline cu_result encrypt( const Container &plain, const aes::key<N> &key );
+  template < std::size_t N, typename Container > static inline cu_result decrypt( const Container &cipher, const aes::key<N> &key );
   template < std::size_t N > static inline std::size_t get_encrypt_length( std::size_t plain_bin_length );
 };
 
@@ -95,59 +97,59 @@ template < std::size_t N > inline void aes::key<N>::print() const
   std::cout << "\n";
 }
 
-template < std::size_t N, typename Container> inline std::vector<std::byte> aes::encrypt( const Container &plain, const aes::key<N> &key )
+template < std::size_t N, typename Container> inline cu_result aes::encrypt( const Container &plain, const aes::key<N> &key )
 {
-  std::vector<std::byte> ret; 
+  cu_result ret = cu_result::empty();
 
   EVP_CIPHER_CTX *cctx = EVP_CIPHER_CTX_new();
 
   if( EVP_EncryptInit_ex( cctx, get_evp_cipher(N), nullptr, key.get_raw(), nullptr) <= 0 ) {
 	EVP_CIPHER_CTX_free( cctx ); 
-	return std::vector<std::byte>();
+	return cu_result::empty();
   } 
 
-  ret.resize( aes::get_encrypt_length<N>(plain.size()) );
+  (*ret).resize( aes::get_encrypt_length<N>(plain.size()) );
   int unpadded_cipher_bin_len = 0;
-  if( EVP_EncryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_cipher_bin_len, reinterpret_cast<const unsigned char*>(plain.data()), plain.size() ) <= 0 ) {
+  if( EVP_EncryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret().data()), &unpadded_cipher_bin_len, reinterpret_cast<const unsigned char*>(plain.data()), plain.size() ) <= 0 ) {
 	EVP_CIPHER_CTX_free( cctx );
-	return std::vector<std::byte>();
+	return cu_result::empty();
   }
   
   int padded_cipher_bin_len = 0;
-  if( EVP_EncryptFinal_ex( cctx, reinterpret_cast<unsigned char*>(ret.data()) + unpadded_cipher_bin_len, &padded_cipher_bin_len ) <= 0 ){
+  if( EVP_EncryptFinal_ex( cctx, reinterpret_cast<unsigned char*>(ret().data()) + unpadded_cipher_bin_len, &padded_cipher_bin_len ) <= 0 ){
 	EVP_CIPHER_CTX_free( cctx );
-	return std::vector<std::byte>();
+	return cu_result::empty();
   }
 
   EVP_CIPHER_CTX_free( cctx );
   return ret;
 }
 
-template < std::size_t N, typename Container > inline std::vector<std::byte> aes::decrypt( const Container &cipher, const aes::key<N> &key )
+template < std::size_t N, typename Container > inline cu_result aes::decrypt( const Container &cipher, const aes::key<N> &key )
 {
-  std::vector<std::byte> ret;
+  cu_result ret = cu_result::empty();
 
   EVP_CIPHER_CTX *cctx = EVP_CIPHER_CTX_new();
 
   if( EVP_DecryptInit_ex( cctx, get_evp_cipher(N), nullptr,  key.get_raw(), nullptr ) <= 0 ){
 	EVP_CIPHER_CTX_free( cctx );
-	return std::vector<std::byte>();
+	return cu_result::empty();
   }
 
-  ret.resize( cipher.size() ); // 後でスライスする
+  (*ret).resize( cipher.size() ); // 後でスライスする
   int unpadded_plain_len = 0;
-  if( EVP_DecryptUpdate( cctx, reinterpret_cast<unsigned char*>(ret.data()), &unpadded_plain_len, reinterpret_cast<const unsigned char*>(cipher.data()), cipher.size() ) <= 0 ){
+  if( EVP_DecryptUpdate( cctx, reinterpret_cast<unsigned char*>((*ret).data()), &unpadded_plain_len, reinterpret_cast<const unsigned char*>(cipher.data()), cipher.size() ) <= 0 ){
 	EVP_CIPHER_CTX_free( cctx );
-	return std::vector<std::byte>();
+	return cu_result::empty();
   }
 
   int padded_plain_len = 0;
-  if( EVP_DecryptFinal( cctx, reinterpret_cast<unsigned char*>(ret.data()) + unpadded_plain_len, &unpadded_plain_len) <= 0 ){
+  if( EVP_DecryptFinal( cctx, reinterpret_cast<unsigned char*>((*ret).data()) + unpadded_plain_len, &unpadded_plain_len) <= 0 ){
 	EVP_CIPHER_CTX_free( cctx );
-	return std::vector<std::byte>();
+	return cu_result::empty();
   }
 
-  ret.resize( padded_plain_len + unpadded_plain_len );
+  (*ret).resize( padded_plain_len + unpadded_plain_len );
   return ret;
 }
 
