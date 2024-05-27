@@ -12,7 +12,7 @@
 
 #include "./evp_pkey.hpp"
 #include "./sha2.hpp"
-#include "./result.hpp"
+#include "./common.hpp"
 
 
 namespace cu

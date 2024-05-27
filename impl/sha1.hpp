@@ -10,7 +10,7 @@
 #include <type_traits>
 
 #include "openssl/evp.h"
-#include "./result.hpp"
+#include "./common.hpp"
 
 
 namespace cu
@@ -21,6 +21,7 @@ class sha1
 {
 public:
   template < typename Container > static inline cu_result hash( const Container &input );
+  template < typename T > static inline cu_result hash( const T *input, std::size_t input_size );
 };
 
 
@@ -57,6 +58,13 @@ template < typename Container > inline cu_result sha1::hash( const Container &in
   return ret;
 }
 
+template < typename T > inline cu_result sha1::hash( const T *input, std::size_t input_size )
+{
+  std::vector< std::byte > input_v;
+  input_v = to_vector( input, input_size );
+  
+  return sha1::hash( input_v );
+}
 
 
 };

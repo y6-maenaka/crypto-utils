@@ -10,7 +10,7 @@
 #include <type_traits>
 
 #include "openssl/evp.h"
-#include "./result.hpp"
+#include "./common.hpp"
 
 
 namespace cu
@@ -39,7 +39,8 @@ const EVP_MD* get_evp_md( std::size_t HASH_TYPE )
 class sha2
 {
 public:
-  template < std::size_t HASH_TYPE ,typename Container > static inline cu_result hash( const Container &input );
+  template < std::size_t HASH_TYPE, typename Container > static inline cu_result hash( const Container &input );
+  template < std::size_t HASH_TYPE, typename T > static inline cu_result hash( const T *input, std::size_t input_size );
 };
 
 
@@ -74,6 +75,12 @@ template < std::size_t HASH_TYPE, typename Container > inline cu_result sha2::ha
  
   EVP_MD_CTX_free( mdctx );
   return ret;
+}
+
+template < std::size_t HASH_TYPE, typename T > inline cu_result sha2::hash( const T *input, std::size_t input_size )
+{
+  std::vector<std::byte> input_v = to_vector( input, input_size );
+  return sha2::hash< HASH_TYPE >( input_v );
 }
 
 

@@ -12,7 +12,7 @@
 
 #include "openssl/evp.h"
 #include "openssl/aes.h"
-#include "./result.hpp"
+#include "./common.hpp"
 
 
 namespace cu

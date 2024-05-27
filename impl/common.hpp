@@ -32,6 +32,9 @@ public:
 };
 
 
+template < typename T > std::vector<std::byte> to_vector( const T *input, std::size_t input_size );
+
+
 cu_result::cu_result()
 {
   return;
@@ -100,6 +103,19 @@ inline bool cu_result::operator ==( const cu_result &db ) const
   if( db.body.size() != body.size() ) return false;
   return std::equal( body.cbegin(), body.cend(), db.body.cbegin() );
   // return std::equal( db.body.cbegin(), db.body.cend(), body.cbegin() );
+}
+
+
+template < typename T > std::vector<std::byte> to_vector( const T *input, std::size_t input_size )
+{
+  std::vector<std::byte> ret;
+  ret.reserve( input_size );
+
+  std::transform( input, input + input_size, std::back_inserter(ret), [](const T &value ){
+	return static_cast<std::byte>(value);
+  });
+
+  return ret;
 }
 
 

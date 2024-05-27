@@ -12,7 +12,7 @@
 #include "openssl/bio.h"
 #include "openssl/evp.h"
 #include "openssl/buffer.h"
-#include "./result.hpp"
+#include "./common.hpp"
 
 
 namespace cu
