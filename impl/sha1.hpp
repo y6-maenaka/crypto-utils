@@ -1,5 +1,5 @@
-#ifndef C5D3220A_2E49_447F_974D_B8A0E140ED8E
-#define C5D3220A_2E49_447F_974D_B8A0E140ED8E
+#ifndef DFD3C8A9_AFC5_4ED2_8605_08B1C1C105E9
+#define DFD3C8A9_AFC5_4ED2_8605_08B1C1C105E9
 
 
 #include <iostream>
@@ -17,38 +17,19 @@ namespace cu
 {
 
 
-constexpr std::size_t SHA224 = 224;
-constexpr std::size_t SHA256 = 256;
-constexpr std::size_t SHA384 = 384;
-constexpr std::size_t SHA512 = 512;
-
-
-const EVP_MD* get_evp_md( std::size_t HASH_TYPE )
-{
-  switch( HASH_TYPE )
-  {
-	case SHA224: return EVP_get_digestbyname( "sha224");
-	case SHA256: return EVP_get_digestbyname("sha256");
-	case SHA384: return EVP_get_digestbyname("sha384");
-	case SHA512: return EVP_get_digestbyname("sha512");
-	default: return nullptr;
-  }
-}
-
-
-class sha2
+class sha1
 {
 public:
-  template < std::size_t HASH_TYPE ,typename Container > static inline std::vector<std::byte> hash( const Container &input );
+  template < typename Container > static inline std::vector<std::byte> hash( const Container &input );
 };
 
 
-template < std::size_t HASH_TYPE, typename Container > inline std::vector<std::byte> sha2::hash( const Container &input )
+template < typename Container > inline std::vector<std::byte> sha1::hash( const Container &input )
 {
   std::vector<std::byte> ret;
 
   EVP_MD_CTX *mdctx = EVP_MD_CTX_create();
-  const EVP_MD *md = get_evp_md( HASH_TYPE );
+  const EVP_MD *md = EVP_get_digestbyname("sha1");
   if( md == nullptr ){
 	EVP_MD_CTX_free( mdctx );
 	return std::vector<std::byte>();
@@ -77,9 +58,7 @@ template < std::size_t HASH_TYPE, typename Container > inline std::vector<std::b
 }
 
 
+
 };
 
-
-#endif // 
-
-
+#endif 
