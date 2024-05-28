@@ -43,8 +43,10 @@ cu_result::cu_result()
 inline std::string cu_result::to_string() const
 {
   std::string ret;
-  std::transform( body.begin(), body.end(), ret.begin(), [](const std::byte &b){
-	return static_cast<char>(std::to_integer<int>(b));
+  ret.resize( body.size() );
+
+  std::transform( body.begin(), body.end(), ret.begin(), [](const cu_result::value_type &b){
+	return static_cast<std::string::value_type>(std::to_integer<int>(b));
   });
 
   return ret;
@@ -53,9 +55,8 @@ inline std::string cu_result::to_string() const
 template < typename T > inline std::vector<T> cu_result::to_vector() const
 {
   std::vector<T> ret;
-  ret.reserve( body.size() );
 
-  std::transform( body.begin(), body.end(), std::back_inserter(ret), [](const std::byte &b){
+  std::transform( body.begin(), body.end(), std::back_inserter(ret), [](const cu_result::value_type &b){
 	return static_cast<T>(std::to_integer<int>(b));
 	  });
 
@@ -64,13 +65,10 @@ template < typename T > inline std::vector<T> cu_result::to_vector() const
 
 template < typename T, std::size_t N > inline std::array<T, N> cu_result::to_array() const
 {
-  static_assert( !(N > body.size()), "Array size too big" );
-
   std::array< T, N > ret;
-  ret.reserve( N );
 
   std::size_t copy_size = std::min( body.size(), N );
-  std::transform( body.begin(), body.begin() + copy_size, []( const std::byte &b ){
+  std::transform( body.begin(), body.begin() + copy_size, ret.begin(), []( const cu_result::value_type &b ){
 	return static_cast<T>(std::to_integer<int>(b));
 	  });
   
