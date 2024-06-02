@@ -32,8 +32,8 @@ public:
   static inline evp_pkey (empty)();
   inline EVP_PKEY *get();
 
-  void set_PKEY( std::shared_ptr<EVP_PKEY> from );
-  void print() const;
+  inline void set_PKEY( std::shared_ptr<EVP_PKEY> from );
+  inline void print() const;
 
 private:
   EVP_PKEY_ref _body{nullptr};
@@ -160,12 +160,12 @@ evp_pkey inline evp_pkey::empty()
   return ret;
 }
 
-void evp_pkey::set_PKEY( std::shared_ptr<EVP_PKEY> from )
+inline void evp_pkey::set_PKEY( std::shared_ptr<EVP_PKEY> from )
 {
   _body = from;
 }
 
-void evp_pkey::print() const
+inline void evp_pkey::print() const
 {
   if( _body == nullptr ){
 	std::cout << "Key not set" << "\n";

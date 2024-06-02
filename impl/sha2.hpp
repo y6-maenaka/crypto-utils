@@ -23,7 +23,7 @@ constexpr std::size_t SHA384 = 384;
 constexpr std::size_t SHA512 = 512;
 
 
-const EVP_MD* get_evp_md( std::size_t HASH_TYPE )
+inline const EVP_MD* get_evp_md( std::size_t HASH_TYPE )
 {
   switch( HASH_TYPE )
   {
