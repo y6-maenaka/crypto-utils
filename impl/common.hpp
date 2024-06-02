@@ -18,7 +18,7 @@ public:
   using value_type = elem_type;
 
   std::vector<elem_type> body;
-  cu_result();
+  inline cu_result();
 
   static inline cu_result (empty)();
   inline std::string to_string() const;
@@ -32,10 +32,10 @@ public:
 };
 
 
-template < typename T > std::vector<std::byte> to_vector( const T *input, std::size_t input_size );
+template < typename T > inline std::vector<std::byte> to_vector( const T *input, std::size_t input_size );
 
 
-cu_result::cu_result()
+inline cu_result::cu_result()
 {
   return;
 }
@@ -104,7 +104,7 @@ inline bool cu_result::operator ==( const cu_result &db ) const
 }
 
 
-template < typename T > std::vector<std::byte> to_vector( const T *input, std::size_t input_size )
+template < typename T > inline std::vector<std::byte> to_vector( const T *input, std::size_t input_size )
 {
   std::vector<std::byte> ret;
   ret.reserve( input_size );

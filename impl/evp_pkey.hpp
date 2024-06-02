@@ -20,8 +20,8 @@ using EVP_PKEY_ref = std::shared_ptr<EVP_PKEY>;
 class evp_pkey
 {
 public:
-  evp_pkey();
-  evp_pkey( EVP_PKEY_ref from );
+  inline evp_pkey();
+  inline evp_pkey( EVP_PKEY_ref from );
 
   inline bool save_pubkey( const std::string &path ) const;
   inline bool save_prikey( const std::string &path, const std::string &pass = "" ) const;
@@ -41,7 +41,7 @@ private:
 
 struct EVP_PKEY_deleter
 {
-  void operator()(EVP_PKEY *pkey) const{
+  inline void operator()(EVP_PKEY *pkey) const{
 	EVP_PKEY_free(pkey);
   }
 };
@@ -56,12 +56,12 @@ inline evp_pkey generate_rsa_evp_pkey( int key_bits, int engine = NID_secp256k1 
 inline evp_pkey generate_ecdsa_evp_pkey( int key_bits = 4096 );
 
 
-evp_pkey::evp_pkey()
+inline evp_pkey::evp_pkey()
 {
   return;
 }
 
-evp_pkey::evp_pkey( EVP_PKEY_ref from )
+inline evp_pkey::evp_pkey( EVP_PKEY_ref from )
 {
   _body = from;
 }

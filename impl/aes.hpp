@@ -61,7 +61,7 @@ public:
   template < std::size_t N > static inline std::size_t get_encrypt_length( std::size_t plain_bin_length );
 };
 
-const EVP_CIPHER* get_evp_cipher(int n)
+inline const EVP_CIPHER* get_evp_cipher(int n)
 {
   switch(n)
   {
