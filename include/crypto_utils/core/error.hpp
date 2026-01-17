@@ -27,7 +27,10 @@ enum class error_code {
     decryption_failed,
     invalid_key_length,
     invalid_iv_length,
+    invalid_tag_length,
     invalid_padding,
+    authentication_failed,
+    random_generation_failed,
 
     // Hash errors
     hash_failed,

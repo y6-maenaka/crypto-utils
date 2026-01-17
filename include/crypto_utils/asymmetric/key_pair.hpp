@@ -72,16 +72,16 @@ public:
         }
 
         const EVP_CIPHER* cipher = passphrase.empty() ? nullptr : EVP_aes_256_cbc();
-        const unsigned char* pass_ptr = passphrase.empty()
+        const char* pass_ptr = passphrase.empty()
             ? nullptr
-            : reinterpret_cast<const unsigned char*>(passphrase.data());
+            : passphrase.data();
         const int pass_len = passphrase.empty() ? 0 : passphrase.size();
 
         if (PEM_write_bio_PKCS8PrivateKey(
                 bio.get(),
                 pkey_.get(),
                 cipher,
-                const_cast<unsigned char*>(pass_ptr),
+                pass_ptr,
                 pass_len,
                 nullptr,
                 nullptr
