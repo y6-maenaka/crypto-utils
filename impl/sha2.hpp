@@ -48,7 +48,7 @@ template < std::size_t HASH_TYPE, typename Container > inline cu_result sha2::ha
 {
   cu_result ret = cu_result::empty();
 
-  EVP_MD_CTX *mdctx = EVP_MD_CTX_create();
+  EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
   const EVP_MD *md = get_evp_md( HASH_TYPE );
   if( md == nullptr ){
 	EVP_MD_CTX_free( mdctx );

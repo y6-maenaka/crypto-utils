@@ -68,13 +68,8 @@ inline evp_pkey::evp_pkey( EVP_PKEY_ref from )
 
 inline bool evp_pkey::save_pubkey( const std::string &path ) const
 {
-  BIO *write_bio_fp = nullptr;
-  if( (write_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
-	BIO_vfree( write_bio_fp );
-	return false;
-  }
-  if( (write_bio_fp = BIO_new_file( path.c_str() , "w" )) == nullptr ){
-	BIO_vfree( write_bio_fp );
+  BIO *write_bio_fp = BIO_new_file( path.c_str() , "w" );
+  if( write_bio_fp == nullptr ){
 	return false;
   }
 
@@ -89,35 +84,25 @@ inline bool evp_pkey::save_pubkey( const std::string &path ) const
 
 inline bool evp_pkey::save_prikey( const std::string &path, const std::string &pass ) const
 {
-  BIO* write_bio_fp = nullptr;
-  if( (write_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
-	BIO_vfree( write_bio_fp );
-	return false;
-  }
-  if( (write_bio_fp = BIO_new_file( path.c_str() ,"w" )) == nullptr ){
-	BIO_vfree( write_bio_fp );
+  BIO* write_bio_fp = BIO_new_file( path.c_str() ,"w" );
+  if( write_bio_fp == nullptr ){
 	return false;
   }
 
-  if( (pass.size()) <= 0 )
-	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), pass.c_str() , pass.size() , nullptr , nullptr );
+  // Fixed: Condition was inverted, and migrated from 3DES to AES-256-CBC
+  if( pass.size() > 0 )
+	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_aes_256_cbc(), pass.c_str() , pass.size() , nullptr , nullptr );
   else
-	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , EVP_des_ede3_cbc(), nullptr, 0 , nullptr , nullptr );
-	
+	PEM_write_bio_PKCS8PrivateKey( write_bio_fp , _body.get() , nullptr, nullptr, 0 , nullptr , nullptr );
+
   BIO_vfree( write_bio_fp );
   return true;
 }
 
 inline bool evp_pkey::load_pubkey( const std::string &path )
 {
-  BIO *read_bio_fp = nullptr;
-  if( (read_bio_fp = BIO_new( BIO_s_file())) == nullptr ){
-	BIO_vfree( read_bio_fp );
-	return false;
-  }
-
-  if( (read_bio_fp = BIO_new_file( path.c_str() ,"r")) == nullptr ){
-	BIO_vfree( read_bio_fp );
+  BIO *read_bio_fp = BIO_new_file( path.c_str() ,"r");
+  if( read_bio_fp == nullptr ){
 	return false;
   }
 
@@ -129,19 +114,14 @@ inline bool evp_pkey::load_pubkey( const std::string &path )
 
 inline bool evp_pkey::load_prikey( const std::string &path, const std::string &pass )
 {
-  BIO *read_bio_fp = nullptr;
-  if( (read_bio_fp = BIO_new( BIO_s_file() )) == nullptr ){
-	BIO_vfree( read_bio_fp );
+  BIO *read_bio_fp = BIO_new_file( path.c_str() ,"r");
+  if( read_bio_fp == nullptr ){
 	return false;
   }
 
-  if( (read_bio_fp = BIO_new_file( path.c_str() ,"r")) == nullptr ){
-	BIO_vfree( read_bio_fp );
-	return false;
-  }
-  
-  if( (pass.size()) <= 0 )
-	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , nullptr, nullptr, (char *)pass.c_str() ), EVP_PKEY_deleter() );
+  // Fixed: Condition was inverted
+  if( pass.size() > 0 )
+	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , nullptr, nullptr, const_cast<char*>(pass.c_str()) ), EVP_PKEY_deleter() );
   else
 	_body = std::shared_ptr<EVP_PKEY>( PEM_read_bio_PrivateKey( read_bio_fp , nullptr, nullptr, nullptr ) , EVP_PKEY_deleter() );
 

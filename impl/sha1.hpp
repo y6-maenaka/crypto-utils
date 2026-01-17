@@ -29,7 +29,7 @@ template < typename Container > inline cu_result sha1::hash( const Container &in
 {
   cu_result ret = cu_result::empty();
 
-  EVP_MD_CTX *mdctx = EVP_MD_CTX_create();
+  EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
   const EVP_MD *md = EVP_get_digestbyname("sha1");
   if( md == nullptr ){
 	EVP_MD_CTX_free( mdctx );
