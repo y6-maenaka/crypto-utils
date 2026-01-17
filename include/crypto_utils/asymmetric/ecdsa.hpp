@@ -208,7 +208,7 @@ public:
         // Verify
         int result = EVP_PKEY_verify(
             pctx.get(),
-            static_cast<const unsigned char*>(signature.data()),
+            reinterpret_cast<const unsigned char*>(signature.data()),
             signature.size(),
             reinterpret_cast<const unsigned char*>(digest.data()),
             digest.size()

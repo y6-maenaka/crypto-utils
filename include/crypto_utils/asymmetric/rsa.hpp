@@ -98,7 +98,7 @@ public:
                 pctx.get(),
                 nullptr,
                 &outlen,
-                static_cast<const unsigned char*>(plaintext.data()),
+                reinterpret_cast<const unsigned char*>(plaintext.data()),
                 plaintext.size()
             ) <= 0) {
             return core::error(
@@ -113,7 +113,7 @@ public:
                 pctx.get(),
                 reinterpret_cast<unsigned char*>(ciphertext.data()),
                 &outlen,
-                static_cast<const unsigned char*>(plaintext.data()),
+                reinterpret_cast<const unsigned char*>(plaintext.data()),
                 plaintext.size()
             ) <= 0) {
             return core::error(
@@ -168,7 +168,7 @@ public:
                 pctx.get(),
                 nullptr,
                 &outlen,
-                static_cast<const unsigned char*>(ciphertext.data()),
+                reinterpret_cast<const unsigned char*>(ciphertext.data()),
                 ciphertext.size()
             ) <= 0) {
             return core::error(
@@ -183,7 +183,7 @@ public:
                 pctx.get(),
                 reinterpret_cast<unsigned char*>(plaintext.data()),
                 &outlen,
-                static_cast<const unsigned char*>(ciphertext.data()),
+                reinterpret_cast<const unsigned char*>(ciphertext.data()),
                 ciphertext.size()
             ) <= 0) {
             return core::error(
@@ -324,7 +324,7 @@ public:
         // Verify
         int result = EVP_PKEY_verify(
             pctx.get(),
-            static_cast<const unsigned char*>(signature.data()),
+            reinterpret_cast<const unsigned char*>(signature.data()),
             signature.size(),
             reinterpret_cast<const unsigned char*>(digest.data()),
             digest.size()

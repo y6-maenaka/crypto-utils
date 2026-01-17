@@ -139,7 +139,7 @@ public:
                 ctx.get(),
                 reinterpret_cast<unsigned char*>(ciphertext.data()),
                 &outlen,
-                static_cast<const unsigned char*>(plaintext.data()),
+                reinterpret_cast<const unsigned char*>(plaintext.data()),
                 plaintext.size()
             ) != 1) {
             return core::error(

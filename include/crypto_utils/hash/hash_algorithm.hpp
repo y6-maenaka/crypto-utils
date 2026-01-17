@@ -28,33 +28,11 @@ public:
     template<core::byte_container Container>
     static core::result<core::byte_vector> hash(const Container& input) {
         return Derived::hash_impl(
-            static_cast<const std::byte*>(input.data()),
+            reinterpret_cast<const std::byte*>(input.data()),
             input.size()
         );
     }
 
-    /**
-     * @brief Hash data from a string
-     *
-     * @tparam String Type satisfying string_like concept
-     * @param input String to hash
-     * @return result<byte_vector> Hash digest or error
-     */
-    template<core::string_like String>
-    static core::result<core::byte_vector> hash(const String& input) {
-        if constexpr (std::same_as<std::remove_cvref_t<String>, const char*> ||
-                      std::same_as<std::remove_cvref_t<String>, char*>) {
-            return hash_impl(
-                reinterpret_cast<const std::byte*>(input),
-                std::strlen(input)
-            );
-        } else {
-            return hash_impl(
-                reinterpret_cast<const std::byte*>(input.data()),
-                input.size()
-            );
-        }
-    }
 
     /**
      * @brief Hash raw byte array
